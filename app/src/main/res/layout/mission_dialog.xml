@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_main"
+        android:orientation="vertical"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="뉴스 댓글 총공"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="목표"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:id="@+id/edit_purpose"
+            android:textColor="@color/text"
+            android:focusable="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/edit_rectangle"
+            android:textCursorDrawable="@drawable/edit_cursor"
+            android:textSize="14sp" />
+
+        <TextView
+            android:text="진행도 업데이트"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/layout_progress"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/text_rate"
+                android:text="3/10"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginRight="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ProgressBar
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:id="@+id/progress_percent"
+                    android:max="100"
+                    android:progress="50"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/text_percent"
+                    android:text="50%"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_minus"
+                android:text="-"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_ripple3"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_plus"
+                android:text="+"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_ripple3"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_max"
+                android:text="MAX"
+                android:textColor="@color/white"
+                android:background="@drawable/btn_ripple3"
+                android:layout_gravity="center"
+                android:layout_width="50dp"
+                android:layout_height="25dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="미션 수행하기"
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/button_execute_app"
+                android:text="실행"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="#E53E51"
+        android:layout_below="@+id/layout_main"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        <Button
+            android:id="@+id/button_ok"
+            android:text="확인"
+            android:textColor="#ddffffff"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"/>
+        <Button
+            android:id="@+id/button_cancel"
+            android:text="취소"
+            android:textColor="#ddffffff"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"/>
+    </LinearLayout>
+
+</RelativeLayout>
