@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentTransaction
 import com.ados.cheerdiary.R.drawable.btn_round
 import com.ados.cheerdiary.dialog.MissionDialog
 import com.ados.cheerdiary.dialog.SelectAppDialog
@@ -156,6 +157,16 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
                 //(binding.layoutPersonal.layoutParams as LinearLayout.LayoutParams).weight = 5F
                 //(binding.layoutTitlePersonal.layoutParams as LinearLayout.LayoutParams).weight = 1F
                 //(binding.layoutClub.layoutParams as LinearLayout.LayoutParams).weight = 5F
+            }
+        }
+
+        binding.buttonSuccessCalendar.setOnClickListener {
+            val fragment = FragmentSuccessCalendarLayout()
+            parentFragmentManager.beginTransaction().apply{
+                replace(R.id.layout_fragment, fragment)
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                addToBackStack(null)
+                commit()
             }
         }
 

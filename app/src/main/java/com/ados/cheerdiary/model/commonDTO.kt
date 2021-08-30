@@ -1,6 +1,7 @@
 package com.ados.cheerdiary.model
 
 import com.ados.cheerdiary.R
+import java.util.*
 
 data class ScheduleDTO(
     var isSelected: Boolean = false,
@@ -72,4 +73,10 @@ data class SignUpDTO(
     var isSelected: Boolean = false,
     var isChecked: Boolean = false,
     val name: String? = null
+) {}
+
+data class WeekDTO(
+    var week: Int? = 0,
+    var startDate: Date? = null,
+    val endDate: Date? = null
 ) {}

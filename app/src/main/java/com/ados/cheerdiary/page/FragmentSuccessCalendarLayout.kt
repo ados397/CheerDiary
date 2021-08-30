@@ -1,11 +1,17 @@
 package com.ados.cheerdiary.page
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentTransaction
 import androidx.viewpager2.widget.ViewPager2
 import com.ados.cheerdiary.MyPagerAdapter
 import com.ados.cheerdiary.MyPagerAdapterSuccessCalendar
@@ -29,6 +35,8 @@ class FragmentSuccessCalendarLayout : Fragment() {
 
     private var _binding: FragmentSuccessCalendarLayoutBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var callback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +71,67 @@ class FragmentSuccessCalendarLayout : Fragment() {
         binding.viewpager.orientation = ViewPager2.ORIENTATION_VERTICAL
 
         binding.viewpager.apply {
-            adapter = MyPagerAdapterSuccessCalendar(context as FragmentActivity)
+            setPagerAdapter(0)
             //setPageTransformer(ZoomOutPageTransformer())
-            currentItem = Int.MAX_VALUE / 2
         }
-        /*firstFragmentStateAdapter.apply {
-            firstFragmentStateAdapter.currentItem (this.firstFragmentPosition, false)
-        }*/
+
+        binding.buttonBack.setOnClickListener {
+            callBackPressed()
+        }
+
+        binding.textTabDay.setOnClickListener {
+            setPagerAdapter(0)
+            setTabButton(binding.textTabDay)
+            releaseTabButton(binding.textTabMonth)
+            releaseTabButton(binding.textTabWeek)
+        }
+        binding.textTabWeek.setOnClickListener {
+            setPagerAdapter(1)
+            setTabButton(binding.textTabWeek)
+            releaseTabButton(binding.textTabDay)
+            releaseTabButton(binding.textTabMonth)
+        }
+        binding.textTabMonth.setOnClickListener {
+            setPagerAdapter(2)
+            setTabButton(binding.textTabMonth)
+            releaseTabButton(binding.textTabDay)
+            releaseTabButton(binding.textTabWeek)
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                callBackPressed()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    private fun callBackPressed() {
+        val fragment = FragmentDashboardMission()
+        parentFragmentManager.beginTransaction().apply{
+            replace(R.id.layout_fragment, fragment)
+            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+            addToBackStack(null)
+            commit()
+        }
+    }
+
+    private fun setPagerAdapter(pageIndex: Int) {
+        binding.viewpager.adapter = MyPagerAdapterSuccessCalendar(context as FragmentActivity, pageIndex)
+        binding.viewpager.currentItem = Int.MAX_VALUE / 2
+    }
+
+    private fun setTabButton(textView: TextView) {
+        textView.background = AppCompatResources.getDrawable(requireContext(), R.drawable.btn_round)
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+    }
+
+    private fun releaseTabButton(textView: TextView) {
+        textView.background = null
+        textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
     }
 
     companion object {

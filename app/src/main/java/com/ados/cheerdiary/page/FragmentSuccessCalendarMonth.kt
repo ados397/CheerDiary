@@ -21,10 +21,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [FragmentSuccessCalendar.newInstance] factory method to
+ * Use the [FragmentSuccessCalendarMonth.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentSuccessCalendar : Fragment() {
+class FragmentSuccessCalendarMonth : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -36,7 +36,7 @@ class FragmentSuccessCalendar : Fragment() {
     lateinit var currentDate: Date
 
     lateinit var recyclerView : RecyclerView
-    lateinit var recyclerViewAdapter : RecyclerViewAdapterSuccessCalendar
+    lateinit var recyclerViewAdapter : RecyclerViewAdapterSuccessCalendarMonth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +56,10 @@ class FragmentSuccessCalendar : Fragment() {
 
         recyclerView = rootView.findViewById(R.id.rv_success_calendar!!)as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.layoutManager = GridLayoutManager(activity, 7)
+        recyclerView.layoutManager = GridLayoutManager(activity, 3)
+
+        binding.calendarHeader.visibility = View.GONE
+        binding.layoutTotal.visibility = View.GONE
 
         initView(rootView)
 
@@ -78,17 +81,16 @@ class FragmentSuccessCalendar : Fragment() {
 
         // 날짜 적용
         val date = Calendar.getInstance().run {
-            add(Calendar.MONTH, pageIndex)
+            add(Calendar.YEAR, pageIndex)
             time
         }
 
-        recyclerViewAdapter = RecyclerViewAdapterSuccessCalendar(binding.layoutSuccessCalendar, date)
+        recyclerViewAdapter = RecyclerViewAdapterSuccessCalendarMonth(binding.layoutSuccessCalendar, date)
         recyclerView.adapter = recyclerViewAdapter
 
         currentDate = date
 
-        binding.textYearMonth.text = SimpleDateFormat("yyyy년 MM월").format(date.time)
-        binding.textTotal.text = SimpleDateFormat("MM월 달성률").format(date.time)
+        binding.textYearMonth.text = SimpleDateFormat("yyyy년").format(date.time)
     }
 
 
@@ -99,12 +101,12 @@ class FragmentSuccessCalendar : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentSuccessCalendar.
+         * @return A new instance of fragment FragmentSuccessCalendarMonth.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            FragmentSuccessCalendar().apply {
+            FragmentSuccessCalendarMonth().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

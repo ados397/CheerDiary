@@ -41,7 +41,8 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_schedule.xml" value="0.3302083333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_schedule_add.xml" value="0.2" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_schedule_list.xml" value="0.33" />
-        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_success_calendar.xml" value="0.33" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_star_profile.xml" value="0.2" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_success_calendar.xml" value="0.25" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_success_calendar_layout.xml" value="0.2390625" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_app_list.xml" value="0.5" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_fan_club.xml" value="0.25885416666666666" />
@@ -50,6 +51,8 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_mission.xml" value="0.24375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_schedule.xml" value="0.3302083333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_calendar.xml" value="0.20885416666666667" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_calendar_month.xml" value="0.75" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_calendar_week.xml" value="0.13125" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_week_calendar.xml" value="0.159375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/mission_dialog.xml" value="0.33" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/select_app_dialog.xml" value="0.12545289855072464" />

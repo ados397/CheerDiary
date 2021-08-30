@@ -20,7 +20,7 @@
             android:textSize="20sp" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/button_back"
+            android:id="@+id/button_success_calendar"
             app:cardElevation="0dp"
             app:rippleColor="#fff"
             android:backgroundTint="@android:color/transparent"
@@ -34,9 +34,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
-                android:src="@drawable/arrow_back"
-                android:layout_width="20dp"
-                android:layout_height="20dp"/>
+                android:src="@drawable/pie_chart"
+                android:layout_width="30dp"
+                android:layout_height="30dp"/>
         </com.google.android.material.card.MaterialCardView>
 
     </RelativeLayout>
