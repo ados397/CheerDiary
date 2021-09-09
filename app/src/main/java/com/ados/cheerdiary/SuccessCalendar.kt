@@ -65,15 +65,38 @@ class SuccessCalendar(date: Date) {
 }
 
 class SuccessCalendarWeek(date: Date) {
+    private val inputDate: Date
     private val calendar = Calendar.getInstance()
     var weekList = arrayListOf<WeekDTO>()
 
     init {
         calendar.time = date
+        inputDate = date
     }
 
     fun initBaseCalendar() {
         makeMonthWeek()
+    }
+
+    fun getCurrentWeek() : WeekDTO? {
+        val calStart = Calendar.getInstance()
+        val calEnd = Calendar.getInstance()
+        for (week in weekList) {
+            calStart.time = week.startDate
+            calStart.set(Calendar.HOUR, 0)
+            calStart.set(Calendar.MINUTE, 0)
+            calStart.set(Calendar.SECOND, 0)
+
+            calEnd.time = week.endDate
+            calEnd.set(Calendar.HOUR, 23)
+            calEnd.set(Calendar.MINUTE, 59)
+            calEnd.set(Calendar.SECOND, 59)
+
+            if (inputDate >= calStart.time && inputDate <= calEnd.time) {
+                return week
+            }
+        }
+        return null
     }
 
     private fun makeMonthWeek() {

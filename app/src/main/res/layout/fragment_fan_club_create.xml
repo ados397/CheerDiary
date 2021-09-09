@@ -50,6 +50,23 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:text="팬클럽 심볼을 선택하세요."
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/img_symbol"
+            android:src="@drawable/reward_icon_25"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="15dp"
+            android:padding="10dp"
+            android:background="@drawable/edit_rectangle"
+            android:layout_width="128dp"
+            android:layout_height="128dp"/>
+
+        <TextView
             android:text="팬클럽 이름을 입력하세요."
             android:layout_marginBottom="5dp"
             android:layout_width="wrap_content"
@@ -76,6 +93,7 @@
         <EditText
             android:id="@+id/edit_description"
             android:textColor="@color/text"
+            android:lines="3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"

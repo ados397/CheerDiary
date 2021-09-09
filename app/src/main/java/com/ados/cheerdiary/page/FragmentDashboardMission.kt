@@ -1,13 +1,11 @@
 package com.ados.cheerdiary.page
 
-import android.app.ActionBar
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ados.cheerdiary.R
@@ -15,13 +13,23 @@ import com.ados.cheerdiary.databinding.FragmentDashboardMissionBinding
 import com.ados.cheerdiary.model.ScheduleDTO
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentTransaction
 import com.ados.cheerdiary.R.drawable.btn_round
+import com.ados.cheerdiary.SuccessCalendarWeek
 import com.ados.cheerdiary.dialog.MissionDialog
-import com.ados.cheerdiary.dialog.SelectAppDialog
+import com.ados.cheerdiary.model.DashboardMissionDTO
+import com.ados.cheerdiary.model.ScheduleProgressDTO
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.select_app_dialog.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.timer
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -42,10 +50,18 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
     private var _binding: FragmentDashboardMissionBinding? = null
     private val binding get() = _binding!!
 
+    private var firebaseAuth : FirebaseAuth? = null
+    private var firestore : FirebaseFirestore? = null
+
     lateinit var recyclerViewClub : RecyclerView
     lateinit var recyclerViewClubAdapter : RecyclerViewAdapterMission
     lateinit var recyclerViewPersonal : RecyclerView
     lateinit var recyclerViewPersonalAdapter : RecyclerViewAdapterMission
+
+    private var personalSchedules : ArrayList<ScheduleDTO> = arrayListOf()
+    private var personalMissions : ArrayList<DashboardMissionDTO> = arrayListOf()
+    private var clubSchedules : ArrayList<ScheduleDTO> = arrayListOf()
+    private var clubMissions : ArrayList<DashboardMissionDTO> = arrayListOf()
 
     private var isExpandClub: Boolean = true
     private var isExpandPersonal: Boolean = true
@@ -65,25 +81,123 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
         // Inflate the layout for this fragment
         _binding = FragmentDashboardMissionBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
         recyclerViewClub = rootView.findViewById(R.id.rv_mission_club!!)as RecyclerView
         recyclerViewClub.layoutManager = LinearLayoutManager(requireContext())
 
-        var datas : ArrayList<ScheduleDTO> = arrayListOf()
-        datas.apply {
-            for (i in 0..100) {
-                add(ScheduleDTO(false, "뉴스 댓글 총공"))
-                add(ScheduleDTO(false, "리매치 2000만 달성"))
-                add(ScheduleDTO(false, "생일 하트 적립"))
-            }
-        }
-        recyclerViewClubAdapter = RecyclerViewAdapterMission(datas, this)
-        recyclerViewClub.adapter = recyclerViewClubAdapter
-
-
         recyclerViewPersonal = rootView.findViewById(R.id.rv_mission_personal!!)as RecyclerView
         recyclerViewPersonal.layoutManager = LinearLayoutManager(requireContext())
-        recyclerViewPersonalAdapter = RecyclerViewAdapterMission(datas, this)
-        recyclerViewPersonal.adapter = recyclerViewPersonalAdapter
+
+
+        recyclerViewClubAdapter = RecyclerViewAdapterMission(clubMissions, this)
+        recyclerViewClub.adapter = recyclerViewClubAdapter
+
+        firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.orderBy("order", Query.Direction.ASCENDING)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+            personalSchedules.clear()
+            personalMissions.clear()
+            if(querySnapshot == null)return@addSnapshotListener
+            for(snapshot in querySnapshot){
+                var schedule = snapshot.toObject(ScheduleDTO::class.java)!!
+                // 현재 시간이 기간내에 속한 스케줄만 표시
+                if (isScheduleVisible(schedule)) {
+                    personalSchedules.add(schedule)
+
+                    var mission = DashboardMissionDTO()
+                    mission.scheduleDTO = schedule
+
+                    var docName = getProgressDocName(schedule)
+
+                    println("스케줄 : $schedule")
+                    println("독네임 : $docName")
+                    firestore?.collection("user")
+                        ?.document(firebaseAuth?.currentUser?.uid.toString())
+                        ?.collection("schedule")?.document(schedule.docName.toString())
+                        ?.collection("progress")?.document(docName)?.get()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                println("조회 성공? $task")
+                                var scheduleProgressDTO = ScheduleProgressDTO(docName, 0)
+                                if (task.result.exists()) { // document 있음
+                                    scheduleProgressDTO =
+                                        task.result.toObject(ScheduleProgressDTO::class.java)!!
+                                }
+
+                                mission.scheduleProgressDTO = scheduleProgressDTO
+
+                                println("프로그레스 : $scheduleProgressDTO")
+                                personalMissions.add(mission)
+                                println("호출2 ${personalMissions.size}")
+                            }
+                        }
+                }
+            }
+            println("호출 순서")
+
+            timer(period = 100)
+            {
+                if (personalSchedules.size == personalMissions.size) {
+                    cancel()
+                    activity?.runOnUiThread {
+                        setAdapter()
+                        println("호출 순서22")
+                        println("호출3 ${personalMissions.size}")
+                    }
+                }
+            }
+        }
+        /*firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.orderBy("order", Query.Direction.ASCENDING)?.get()?.addOnSuccessListener { result ->
+            personalSchedules.clear()
+            personalMissions.clear()
+            println("호출1 ${personalMissions.size}")
+            for (document in result) {
+                var schedule = document.toObject(ScheduleDTO::class.java)!!
+                personalSchedules.add(schedule)
+
+                var mission = DashboardMissionDTO()
+                mission.scheduleDTO = schedule
+
+                var docName = getProgressDocName(schedule)
+
+                println("스케줄 : $schedule")
+                println("독네임 : $docName")
+                firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.document(schedule.docName.toString())?.collection("progress")?.document(docName)?.get()?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        println("조회 성공? $task")
+                        var scheduleProgressDTO = ScheduleProgressDTO(docName, 0)
+                        if (task.result.exists()) { // document 있음
+                            scheduleProgressDTO = task.result.toObject(ScheduleProgressDTO::class.java)!!
+                        }
+
+                        mission.scheduleProgressDTO = scheduleProgressDTO
+
+                        println("프로그레스 : $scheduleProgressDTO")
+                        personalMissions.add(mission)
+                        println("호출2 ${personalMissions.size}")
+                    }
+                }
+            }
+            println("호출 순서")
+
+            timer(period = 100)
+            {
+                if (personalSchedules.size == personalMissions.size) {
+                    cancel()
+                    activity?.runOnUiThread {
+                        setAdapter()
+                        println("호출 순서22")
+                        println("호출3 ${personalMissions.size}")
+                    }
+                }
+            }
+        }?.addOnFailureListener { exception ->
+
+        }*/
+
+
+
 
         return rootView
     }
@@ -196,6 +310,49 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
         }
     }
 
+    private fun setAdapter() {
+        recyclerViewPersonalAdapter = RecyclerViewAdapterMission(personalMissions, this)
+        recyclerViewPersonal.adapter = recyclerViewPersonalAdapter
+    }
+
+    // 현재 시간이 기간내에 속한 스케줄인지 확인
+    private fun isScheduleVisible(schedule: ScheduleDTO) : Boolean {
+        val calStart = Calendar.getInstance()
+        calStart.time = schedule.startDate
+        calStart.set(Calendar.HOUR, 0)
+        calStart.set(Calendar.MINUTE, 0)
+        calStart.set(Calendar.SECOND, 0)
+
+        val calEnd = Calendar.getInstance()
+        calEnd.time = schedule.endDate
+        calEnd.set(Calendar.HOUR, 23)
+        calEnd.set(Calendar.MINUTE, 59)
+        calEnd.set(Calendar.SECOND, 59)
+
+        var date = Date()
+
+        return date >= calStart.time && date <= calEnd.time
+    }
+
+    private fun getProgressDocName(schedule: ScheduleDTO) : String {
+        var docName = ""
+
+        when (schedule.cycle) {
+            ScheduleDTO.CYCLE.DAY -> docName = SimpleDateFormat("yyyyMMdd").format(Date())
+            ScheduleDTO.CYCLE.WEEK -> {
+                var successCalendarWeek = SuccessCalendarWeek(Date())
+                successCalendarWeek.initBaseCalendar()
+                var week = successCalendarWeek.getCurrentWeek()
+                if (week != null) {
+                    docName = "${SimpleDateFormat("yyyyMMdd").format(week.startDate)}${SimpleDateFormat("yyyyMMdd").format(week.endDate)}"
+                }
+            }
+            ScheduleDTO.CYCLE.MONTH -> docName = SimpleDateFormat("yyyyMM").format(Date())
+            ScheduleDTO.CYCLE.PERIOD -> docName = "${SimpleDateFormat("yyMMdd").format(schedule.startDate)}${SimpleDateFormat("yyMMdd").format(schedule.endDate)}"
+        }
+        return docName
+    }
+
     private fun setTabButton(textView: TextView) {
         textView.background = getDrawable(requireContext(), btn_round)
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -226,10 +383,11 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
             }
     }
 
-    override fun onItemClick(item: ScheduleDTO, position: Int) {
+    override fun onItemClick(item: DashboardMissionDTO, position: Int) {
         val dialog = MissionDialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(false)
+        dialog.dashboardMissionDTO = item
         dialog.show()
 
         dialog.button_cancel.setOnClickListener { // No
@@ -237,6 +395,12 @@ class FragmentDashboardMission : Fragment(), OnMissionItemClickListener {
         }
 
         dialog.button_ok.setOnClickListener { // Ok
+            item.scheduleProgressDTO?.count = dialog.missionCount
+            firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.document(item.scheduleDTO?.docName.toString())?.collection("progress")?.document(item.scheduleProgressDTO?.docName.toString())?.set(item.scheduleProgressDTO!!)?.addOnCompleteListener {
+                recyclerViewPersonalAdapter.notifyItemChanged(position)
+                Toast.makeText(activity,"적용 완료.", Toast.LENGTH_SHORT).show()
+                println("미션 적용 완료 ${personalMissions.size}")
+            }
 
             dialog.dismiss()
         }

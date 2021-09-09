@@ -4,13 +4,26 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.SuccessCalendarWeek
 import com.ados.cheerdiary.databinding.ListItemMissionBinding
+import com.ados.cheerdiary.model.DashboardMissionDTO
 import com.ados.cheerdiary.model.ScheduleDTO
+import com.ados.cheerdiary.model.ScheduleProgressDTO
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-class RecyclerViewAdapterMission(private val items: ArrayList<ScheduleDTO>, var clickListener: OnMissionItemClickListener) : RecyclerView.Adapter<RecyclerViewAdapterMission.ViewHolder>() {
+class RecyclerViewAdapterMission(private val items: ArrayList<DashboardMissionDTO>, var clickListener: OnMissionItemClickListener) : RecyclerView.Adapter<RecyclerViewAdapterMission.ViewHolder>() {
+
+    private var firebaseAuth : FirebaseAuth? = null
+    private var firestore : FirebaseFirestore? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ListItemMissionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
         return ViewHolder(view)
     }
 
@@ -23,38 +36,24 @@ class RecyclerViewAdapterMission(private val items: ArrayList<ScheduleDTO>, var 
 
         items[position].let { item ->
             with(holder) {
-                title.text = "${item.title}"
+                title.text = "${item.scheduleDTO?.title}"
+                count.text = "${item.scheduleProgressDTO?.count}/${item.scheduleDTO?.count}"
 
-                if (item.isSelected) {
-                    mainLayout.setBackgroundColor(Color.parseColor("#BBD5F8"))
-                } else {
-                    mainLayout.setBackgroundColor(Color.parseColor("#FFFFFF"))
-                }
+                var percentage = ((item.scheduleProgressDTO?.count?.toDouble()!! / item.scheduleDTO?.count!!) * 100).toInt()
+                percent.text = "$percentage%"
+                progress.progress = percentage
             }
-        }
-    }
-
-    // 이미 선택된 항목을 선택할 경우 선택을 해제하고 false 반환, 아닐경우 해당항목 선택 후 true 반환
-    fun selectItem(position: Int) : Boolean {
-        return if (items[position].isSelected) {
-            items[position].isSelected = false
-            notifyDataSetChanged()
-            false
-        } else {
-            for (item in items) {
-                item.isSelected = false
-            }
-            items[position].isSelected = true
-            notifyDataSetChanged()
-            true
         }
     }
 
     inner class ViewHolder(private val viewBinding: ListItemMissionBinding) : RecyclerView.ViewHolder(viewBinding.root) {
         var title = viewBinding.textTitle
+        var count = viewBinding.textCount
+        var percent = viewBinding.textPercent
+        var progress = viewBinding.progressPercent
         var mainLayout = viewBinding.layoutMain
 
-        fun initializes(item: ScheduleDTO, action:OnMissionItemClickListener) {
+        fun initializes(item: DashboardMissionDTO, action:OnMissionItemClickListener) {
             viewBinding.layoutMain.setOnClickListener {
                 action.onItemClick(item, adapterPosition)
             }
@@ -65,5 +64,5 @@ class RecyclerViewAdapterMission(private val items: ArrayList<ScheduleDTO>, var 
 }
 
 interface OnMissionItemClickListener {
-    fun onItemClick(item: ScheduleDTO, position: Int)
+    fun onItemClick(item: DashboardMissionDTO, position: Int)
 }

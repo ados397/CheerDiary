@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.MissionDialogBinding
+import com.ados.cheerdiary.model.DashboardMissionDTO
+import com.ados.cheerdiary.model.ScheduleDTO
 
 
 class MissionDialog(context: Context, private val isRange: Boolean = true) : Dialog(context), View.OnClickListener {
@@ -19,9 +21,11 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
 
     private val layout = R.layout.mission_dialog
 
-    private var missionCount: Int = 3
-    private var missionCountMax: Int = 10
-    private var missionPercent: Int = 0
+    var dashboardMissionDTO: DashboardMissionDTO? = null
+
+    var missionCount: Long = 0L
+    var missionCountMax: Long = 0L
+    var missionPercent: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +34,12 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
 
         //window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        binding.textTitle.text = dashboardMissionDTO?.scheduleDTO?.title
+        binding.editPurpose.setText(dashboardMissionDTO?.scheduleDTO?.purpose)
+
+        missionCount = dashboardMissionDTO?.scheduleProgressDTO?.count!!
+        missionCountMax = dashboardMissionDTO?.scheduleDTO?.count!!
 
         binding.textRate.text = "${missionCount}/${missionCountMax}"
         getPercent()
@@ -58,20 +68,23 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
         }
 
         binding.buttonExecuteApp.setOnClickListener {
-            if (true) { // 앱 실행
-                val linePackage = "com.iloen.melon"
-                val intentLine = context.packageManager.getLaunchIntentForPackage(linePackage) // 인텐트에 패키지 주소 저장
+            when (dashboardMissionDTO?.scheduleDTO?.action) { // 앱 실행
+                ScheduleDTO.ACTION.APP -> {
+                    val linePackage = dashboardMissionDTO?.scheduleDTO?.appDTO?.packageName.toString()
+                    val intentLine = context.packageManager.getLaunchIntentForPackage(linePackage) // 인텐트에 패키지 주소 저장
 
-                try {
-                    context.startActivity(intentLine) // 라인 앱을 실행해본다.
-                } catch (e: Exception) {  // 만약 실행이 안된다면 (앱이 없다면)
-                    val intentPlayStore = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$linePackage")) // 설치 링크를 인텐트에 담아
-                    context.startActivity(intentPlayStore) // 플레이스토어로 이동
+                    try {
+                        context.startActivity(intentLine) // 라인 앱을 실행해본다.
+                    } catch (e: Exception) {  // 만약 실행이 안된다면 (앱이 없다면)
+                        val intentPlayStore = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$linePackage")) // 설치 링크를 인텐트에 담아
+                        context.startActivity(intentPlayStore) // 플레이스토어로 이동
+                    }
                 }
-            } else { // 링크 실행
-                val address = "http://naver.me/5IF5g57m"
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(address))
-                context.startActivity(intent)
+                ScheduleDTO.ACTION.URL -> {
+                    val address = dashboardMissionDTO?.scheduleDTO?.url
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(address))
+                    context.startActivity(intent)
+                }
             }
         }
 
@@ -79,10 +92,10 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
     }
 
     private fun getPercent() {
-        var percentage = ((missionCount.toDouble() / missionCountMax) * 100).toInt()
-        binding.progressPercent.progress = percentage
+        missionPercent = ((missionCount.toDouble() / missionCountMax) * 100).toInt()
+        binding.progressPercent.progress = missionPercent
 
-        binding.textPercent.text = "${percentage}%"
+        binding.textPercent.text = "${missionPercent}%"
     }
 
     fun setButtonOk(name: String) {

@@ -6,11 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentFanClubInfoBinding
+import com.ados.cheerdiary.model.FanClubDTO
 import com.ados.cheerdiary.model.MemberDTO
+import com.ados.cheerdiary.model.UserDTO
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,8 +35,13 @@ class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
     private var _binding: FragmentFanClubInfoBinding? = null
     private val binding get() = _binding!!
 
+    private var firestore : FirebaseFirestore? = null
+
     lateinit var recyclerView : RecyclerView
     lateinit var recyclerViewAdapter : RecyclerViewAdapterFanClubMember
+
+    private var fanClubDTO: FanClubDTO? = null
+    private var members : ArrayList<MemberDTO> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,23 +59,39 @@ class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
         _binding = FragmentFanClubInfoBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
 
+        firestore = FirebaseFirestore.getInstance()
+
         recyclerView = rootView.findViewById(R.id.rv_fan_club_member!!)as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // 메뉴는 기본 숨김
         binding.layoutMenu.visibility = View.GONE
 
-        var datas : ArrayList<MemberDTO> = arrayListOf()
-        datas.apply {
-            for (i in 0..100) {
-                add(MemberDTO(false, "영웅시대", 10000, MemberDTO.POSITION.MASTER, true))
-                add(MemberDTO(false, "희랑별", 1000, MemberDTO.POSITION.SUB_MASTER, false))
-                add(MemberDTO(false, "우주총동원", 100, MemberDTO.POSITION.MEMBER, false))
+        val user = (activity as MainActivity?)?.getUser()
+        firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (task.result.exists()) { // document 있음
+                    fanClubDTO = task.result.toObject(FanClubDTO::class.java)!!
+
+                    firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.collection("member")?.get()?.addOnCompleteListener { task ->
+                        members.clear()
+                        if(task.isSuccessful) {
+                            for (document in task.result) {
+                                var member = document.toObject(MemberDTO::class.java)!!
+                                if (member.position != MemberDTO.POSITION.GUEST) {
+                                    members.add(member)
+                                }
+                            }
+
+                            recyclerViewAdapter = RecyclerViewAdapterFanClubMember(members, this)
+                            recyclerView.adapter = recyclerViewAdapter
+                        }
+                    }
+                } else {
+                    // 팬클럽 정보 가져오기 실패
+                }
             }
         }
-
-        recyclerViewAdapter = RecyclerViewAdapterFanClubMember(datas, this)
-        recyclerView.adapter = recyclerViewAdapter
 
         return rootView
     }

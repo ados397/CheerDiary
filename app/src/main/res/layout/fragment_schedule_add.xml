@@ -68,15 +68,37 @@
 
             <EditText
                 android:id="@+id/edit_title"
-                android:textColor="@color/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="15dp"
                 android:background="@drawable/edit_rectangle"
+                android:maxLength="30"
+                android:textColor="@color/text"
                 android:textCursorDrawable="@drawable/edit_cursor"
                 android:textSize="14sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/text_title_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:text=""
+                    android:textColor="#FF0000"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/text_title_len"
+                    android:layout_alignParentRight="true"
+                    android:text="0/30"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/text_period"
@@ -88,12 +110,11 @@
                 android:textSize="14sp" />
 
             <RelativeLayout
-                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="15dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/edit_start_date"
@@ -110,26 +131,36 @@
 
                 <TextView
                     android:id="@+id/text_tilde"
-                    android:text="~"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="~" />
 
                 <EditText
                     android:id="@+id/edit_end_date"
-                    android:focusable="false"
-                    android:textColor="@color/text"
-                    android:layout_alignParentRight="true"
-                    android:layout_toRightOf="@+id/text_tilde"
-                    android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@+id/text_tilde"
                     android:background="@drawable/edit_rectangle"
+                    android:focusable="false"
+                    android:textColor="@color/text"
                     android:textCursorDrawable="@drawable/edit_cursor"
                     android:textSize="14sp" />
 
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_range_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="5dp"
+                android:text=""
+                android:textColor="#FF0000"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/text_purpose"
@@ -142,15 +173,38 @@
 
             <EditText
                 android:id="@+id/edit_purpose"
-                android:textColor="@color/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="15dp"
                 android:background="@drawable/edit_rectangle"
+                android:lines="3"
+                android:maxLength="300"
+                android:textColor="@color/text"
                 android:textCursorDrawable="@drawable/edit_cursor"
                 android:textSize="14sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/text_purpose_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:text=""
+                    android:textColor="#FF0000"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/text_purpose_len"
+                    android:layout_alignParentRight="true"
+                    android:text="0/300"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -161,7 +215,7 @@
                 android:textSize="14sp" />
 
             <RadioGroup
-                android:id="@+id/radio_group"
+                android:id="@+id/radio_group_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp">
@@ -175,44 +229,54 @@
 
                 <LinearLayout
                     android:id="@+id/layout_select_app"
-                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
                     <Button
                         android:id="@+id/button_select_app"
-                        android:text="앱 선택"
-                        android:layout_marginLeft="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="앱 선택" />
 
                     <TextView
                         android:id="@+id/text_selected_app"
-                        android:text="선택된 앱"
-                        android:textSize="12sp"
-                        android:textColor="@color/text"
-                        android:layout_marginLeft="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="선택된 앱"
+                        android:textColor="@color/text"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <RadioButton
-                    android:id="@+id/radio_link"
+                    android:id="@+id/radio_url"
                     android:layout_width="wrap_content"
                     android:layout_height="30sp"
                     android:text="링크 실행"
                     android:textSize="12sp" />
 
                 <EditText
-                    android:id="@+id/edit_link"
-                    android:textColor="@color/text"
-                    android:hint="링크 주소를 입력하세요"
+                    android:id="@+id/edit_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:background="@drawable/edit_rectangle"
+                    android:hint="링크 주소를 입력하세요"
+                    android:textColor="@color/text"
                     android:textCursorDrawable="@drawable/edit_cursor"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/text_url_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text=""
+                    android:textColor="#FF0000"
+                    android:textSize="10sp" />
 
             </RadioGroup>
 
@@ -225,12 +289,14 @@
                 android:textSize="14sp" />
 
             <RadioGroup
+                android:id="@+id/radio_group_cycle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/radio_day"
                     android:layout_width="wrap_content"
                     android:layout_height="30sp"
                     android:layout_marginRight="5dp"
@@ -238,6 +304,7 @@
                     android:textSize="12sp" />
 
                 <RadioButton
+                    android:id="@+id/radio_week"
                     android:layout_width="wrap_content"
                     android:layout_height="30sp"
                     android:layout_marginRight="5dp"
@@ -245,6 +312,7 @@
                     android:textSize="12sp" />
 
                 <RadioButton
+                    android:id="@+id/radio_month"
                     android:layout_width="wrap_content"
                     android:layout_height="30sp"
                     android:layout_marginRight="5dp"
@@ -252,6 +320,7 @@
                     android:textSize="12sp" />
 
                 <RadioButton
+                    android:id="@+id/radio_period"
                     android:layout_width="wrap_content"
                     android:layout_height="30sp"
                     android:layout_marginRight="5dp"
@@ -270,16 +339,26 @@
 
             <EditText
                 android:id="@+id/edit_count"
-                android:textColor="@color/text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginBottom="15dp"
                 android:background="@drawable/edit_rectangle"
                 android:inputType="numberDecimal"
+                android:maxLength="9"
+                android:textColor="@color/text"
                 android:textCursorDrawable="@drawable/edit_cursor"
                 android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/text_count_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="5dp"
+                android:text=""
+                android:textColor="#FF0000"
+                android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -292,99 +371,102 @@
             <Switch
                 android:id="@+id/switch_alarm"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:id="@+id/layout_alarm"
-                android:orientation="vertical"
-                android:layout_marginBottom="15dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:orientation="vertical">
+
                 <TimePicker
                     android:id="@+id/timepicker_alarm"
-                    android:timePickerMode="spinner"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <TextView
                         android:id="@+id/text_alarm_date"
-                        android:text="알람날짜"
-                        android:layout_marginLeft="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="알람날짜" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/button_alarm_calendar"
-                        app:cardElevation="0dp"
-                        app:rippleColor="#fff"
-                        android:backgroundTint="@android:color/transparent"
-                        android:clickable="true"
-                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginTop="5dp"
                         android:layout_marginRight="30dp"
                         android:layout_marginBottom="5dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:backgroundTint="@android:color/transparent"
+                        android:clickable="true"
+                        app:cardElevation="0dp"
+                        app:rippleColor="#fff">
+
                         <ImageView
-                            android:src="@drawable/calendar"
                             android:layout_width="20dp"
-                            android:layout_height="20dp"/>
+                            android:layout_height="20dp"
+                            android:src="@drawable/calendar" />
 
                     </com.google.android.material.card.MaterialCardView>
                 </RelativeLayout>
-    
+
                 <com.nex3z.togglebuttongroup.MultiSelectToggleGroup
                     android:id="@+id/weekGroup"
-                    app:tbgChildSpacing="auto"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-    
+                    android:layout_height="wrap_content"
+                    app:tbgChildSpacing="auto">
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_sun"
-                        android:text="일"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="일" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_mon"
-                        android:text="월"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="월" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_tues"
-                        android:text="화"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="화" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_wed"
-                        android:text="수"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="수" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_thurs"
-                        android:text="목"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="목" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_fri"
-                        android:text="금"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="금" />
+
                     <com.nex3z.togglebuttongroup.button.CircularToggle
                         android:id="@+id/day_sat"
-                        android:text="토"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-    
+                        android:layout_height="wrap_content"
+                        android:text="토" />
+
                 </com.nex3z.togglebuttongroup.MultiSelectToggleGroup>
             </LinearLayout>
 
@@ -397,9 +479,9 @@
 
             <Switch
                 android:id="@+id/switch_share"
-                android:layout_marginBottom="50dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp" />
 
         </LinearLayout>
 
@@ -465,6 +547,7 @@
 
         <Button
             android:id="@+id/button_ok"
+            android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"

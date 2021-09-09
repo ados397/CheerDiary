@@ -5,19 +5,25 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.SelectAppDialogBinding
 import com.ados.cheerdiary.model.AppDTO
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
-class SelectAppDialog(context: Context) : Dialog(context), OnItemClickListener {
+class SelectAppDialog(context: Context) : Dialog(context), OnAppListClickListener {
 
     lateinit var binding: SelectAppDialogBinding
 
+    private var firestore : FirebaseFirestore? = null
+
     private val layout = R.layout.select_app_dialog
     var recyclerViewAdapter: RecyclerViewAdapterAppList? = null
-    var selectedAppName: String = ""
+    var selectedApp: AppDTO? = null
+
+    private var apps : ArrayList<AppDTO> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +31,8 @@ class SelectAppDialog(context: Context) : Dialog(context), OnItemClickListener {
         setContentView(binding.root)
 
         window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT)
+
+        firestore = FirebaseFirestore.getInstance()
 
         //var rootView = binding.root.rootView
         //recyclerView = rootView.findViewById(R.id.rv_app_list!!)as RecyclerView
@@ -34,15 +42,20 @@ class SelectAppDialog(context: Context) : Dialog(context), OnItemClickListener {
 
         binding.rvAppList.layoutManager = GridLayoutManager(context, 3)
 
-        var people : ArrayList<AppDTO> = arrayListOf()
-        for (i in 0..30) {
-            people.add(AppDTO(false, "com.iloen.melon", "멜론", "https://play-lh.googleusercontent.com/GweSpOJ7p8RZ0lzMDr7sU0x5EtvbsAubkVjLY-chdyV6exnSUfl99Am0g8X0w_a2Qo4=s180-rw"))
+        firestore?.collection("app")?.orderBy("order", Query.Direction.ASCENDING)?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                apps.clear()
+                for (document in task.result) {
+                    var app = document.toObject(AppDTO::class.java)!!
+                    apps.add(app)
+                }
+
+                recyclerViewAdapter = RecyclerViewAdapterAppList(apps, this)
+                binding.rvAppList.adapter = recyclerViewAdapter
+            }
         }
 
 
-
-        recyclerViewAdapter = RecyclerViewAdapterAppList(people, this)
-        binding.rvAppList.adapter = recyclerViewAdapter
 
         /*var firestore = FirebaseFirestore.getInstance()
         firestore?.collection("people")?.get()?.addOnSuccessListener { result ->
@@ -64,7 +77,7 @@ class SelectAppDialog(context: Context) : Dialog(context), OnItemClickListener {
 
     override fun onItemClick(item: AppDTO, position: Int) {
         recyclerViewAdapter?.selectItem(position)
-        selectedAppName = item.appName.toString()
+        selectedApp = item
     }
 
 }

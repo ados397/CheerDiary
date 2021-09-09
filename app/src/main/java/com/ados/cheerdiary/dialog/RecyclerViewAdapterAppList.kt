@@ -60,7 +60,7 @@ class RecyclerViewAdapterAppList(private val items: ArrayList<AppDTO>, var click
         var iconImage = viewBinding.imgIcon
         val appName = viewBinding.textAppName
 
-        fun initalize(item: AppDTO, action:OnItemClickListener) {
+        fun initalize(item: AppDTO, action:OnAppListClickListener) {
             /*itemView.setOnClickListener {
                 action.onItemClick(item, adapterPosition)
                 itemView.img_favorite.setImageResource(R.drawable.star_icon_fill)
@@ -81,6 +81,6 @@ class RecyclerViewAdapterAppList(private val items: ArrayList<AppDTO>, var click
 
 }
 
-interface OnItemClickListener {
+interface OnAppListClickListener {
     fun onItemClick(item: AppDTO, position: Int)
 }

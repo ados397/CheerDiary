@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ados.cheerdiary.databinding.ListItemFanClubBinding
 import com.ados.cheerdiary.model.FanClubDTO
+import com.bumptech.glide.Glide
 
 class RecyclerViewAdapterFanClub(private val items: ArrayList<FanClubDTO>, var clickListener: OnFanClubItemClickListener) : RecyclerView.Adapter<RecyclerViewAdapterFanClub.ViewHolder>() {
 
@@ -23,9 +24,19 @@ class RecyclerViewAdapterFanClub(private val items: ArrayList<FanClubDTO>, var c
 
         items[position].let { item ->
             with(holder) {
+                var imageID = itemView.context.resources.getIdentifier(item.iconImage, "drawable", itemView.context.packageName)
+                if (image != null && imageID > 0) {
+                    //iconImage?.setImageResource(item)
+                    Glide.with(image.context)
+                        .asBitmap()
+                        .load(imageID) ///feed in path of the image
+                        .fitCenter()
+                        .into(holder.image)
+                }
+
                 name.text = "${item.name}"
                 level.text = "Lv. ${item.level}"
-                master.text = "${item.master}"
+                master.text = "${item.masterNickname}"
                 count.text = "${item.count}/30"
 
                 if (item.isSelected) {

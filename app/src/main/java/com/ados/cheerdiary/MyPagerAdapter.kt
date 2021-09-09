@@ -22,7 +22,7 @@ class MyPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa) {
                 FragmentPageSchedule.newInstance("Page3", "")
             }
             else -> {
-                FragmentSuccessCalendarLayout.newInstance("Page4", "")
+                FragmentPageAccount.newInstance("Page4", "")
             }
         }
     }

@@ -23,7 +23,7 @@ class RecyclerViewAdapterFanClubMember(private val items: ArrayList<MemberDTO>, 
 
         items[position].let { item ->
             with(holder) {
-                name.text = "${item.name}"
+                name.text = "${item.userNickname}"
                 contribution.text = "기여도 : ${item.contribution}"
 
                 imagePosition.setImageResource(item.getPositionImage())

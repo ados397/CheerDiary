@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Cheer Diary</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="facebook_app_id">167461998763378</string>
+    <string name="fb_login_protocol_scheme">fb167461998763378</string>
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

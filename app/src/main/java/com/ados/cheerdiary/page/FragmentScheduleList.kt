@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentScheduleListBinding
 import com.ados.cheerdiary.model.ScheduleDTO
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,8 +36,14 @@ class FragmentScheduleList : Fragment(), OnScheduleItemClickListener {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
+    private var firebaseAuth : FirebaseAuth? = null
+    private var firestore : FirebaseFirestore? = null
+
     lateinit var recyclerView : RecyclerView
     lateinit var recyclerViewAdapter : RecyclerViewAdapterSchedule
+
+    private var schedules : ArrayList<ScheduleDTO> = arrayListOf()
+    private var selectedSchedule: ScheduleDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,39 +59,32 @@ class FragmentScheduleList : Fragment(), OnScheduleItemClickListener {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
-
         var rootView = binding.root.rootView
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
         recyclerView = rootView.findViewById(R.id.rv_schedule!!)as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // 메뉴는 기본 숨김
         binding.layoutMenu.visibility = View.GONE
 
-        var datas : ArrayList<ScheduleDTO> = arrayListOf()
-        datas.apply {
-            add(ScheduleDTO(false, "aaa1"))
-            add(ScheduleDTO(false, "aaa2"))
-            add(ScheduleDTO(false, "aaa3"))
-            add(ScheduleDTO(false, "aaa4"))
-            add(ScheduleDTO(false, "aaa5"))
-            add(ScheduleDTO(false, "aaa6"))
-            add(ScheduleDTO(false, "aaa7"))
-            add(ScheduleDTO(false, "aaa8"))
-            add(ScheduleDTO(false, "aaa9"))
-            add(ScheduleDTO(false, "aaa10"))
-            add(ScheduleDTO(false, "aaa11"))
-            add(ScheduleDTO(false, "aaa12"))
-            add(ScheduleDTO(false, "aaa13"))
-            add(ScheduleDTO(false, "aaa14"))
-            add(ScheduleDTO(false, "aaa15"))
-            add(ScheduleDTO(false, "aaa16"))
-            add(ScheduleDTO(false, "aaa17"))
-            add(ScheduleDTO(false, "aaa18"))
-            add(ScheduleDTO(false, "aaa19"))
+        firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.orderBy("order", Query.Direction.ASCENDING)?.get()?.addOnSuccessListener { result ->
+            println("스케줄 호출")
+            schedules.clear()
+            for (document in result) {
+                var schedule = document.toObject(ScheduleDTO::class.java)!!
+                schedules.add(schedule)
+            }
+            recyclerViewAdapter = RecyclerViewAdapterSchedule(schedules, this)
+            recyclerView.adapter = recyclerViewAdapter
+        }?.addOnFailureListener { exception ->
+
         }
 
-        recyclerViewAdapter = RecyclerViewAdapterSchedule(datas, this)
-        recyclerView.adapter = recyclerViewAdapter
+
+
 
         val swipeHelperCallback = SwipeHelperCallback()
         val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
@@ -111,6 +113,7 @@ class FragmentScheduleList : Fragment(), OnScheduleItemClickListener {
 
         binding.buttonModify.setOnClickListener {
             val fragment = FragmentScheduleAdd()
+            fragment.scheduleDTO = selectedSchedule!!
             parentFragmentManager.beginTransaction().apply{
                 replace(R.id.layout_fragment, fragment)
                 setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -146,6 +149,7 @@ class FragmentScheduleList : Fragment(), OnScheduleItemClickListener {
             binding.layoutMenu.visibility = View.VISIBLE
             binding.layoutMenu.startAnimation(translateUp)
             //recyclerView.smoothSnapToPosition(position)
+            selectedSchedule = item
         } else { // 해제 일 경우 메뉴 숨김 및 레이아웃 밝게
             val translateDown = AnimationUtils.loadAnimation(context, R.anim.translate_down)
             binding.layoutMenu.visibility = View.GONE

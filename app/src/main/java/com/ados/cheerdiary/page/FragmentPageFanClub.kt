@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentPageFanClubBinding
 
@@ -42,11 +43,14 @@ class FragmentPageFanClub : Fragment() {
         _binding = FragmentPageFanClubBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
 
-        //val fragment = FragmentFanClubInitalize()
-        //childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
-
-        val fragment = FragmentFanClubMain()
-        childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
+        val user = (activity as MainActivity?)?.getUser()
+        if (user?.fanClubId.isNullOrEmpty()) { // 가입된 팬클럽이 없으면 창설/가입 페이지로
+            val fragment = FragmentFanClubInitalize()
+            childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
+        } else { // 가입된 팬클럽이 있으면 팬클럽 정보 페이지로
+            val fragment = FragmentFanClubMain()
+            childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
+        }
 
         return rootView
     }

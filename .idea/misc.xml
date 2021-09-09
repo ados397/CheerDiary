@@ -7,6 +7,7 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable-v21/btn_ripple2.xml" value="0.39895833333333336" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable-v21/btn_ripple3.xml" value="0.39179487179487177" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable-v21/btn_round.xml" value="0.39895833333333336" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable-v21/btn_round2.xml" value="0.2558974358974359" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.39895833333333336" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/btn_round.xml" value="0.3984375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/btn_round2.xml" value="0.39895833333333336" />
@@ -14,9 +15,12 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/circle_progressbar.xml" value="0.13802083333333334" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/edit_cursor.xml" value="0.20625" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/edit_rectangle.xml" value="0.20625" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/edit_rectangle_red.xml" value="0.2512820512820513" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/fullscreen.xml" value="0.17552083333333332" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/ic_baseline_format_list_bulleted_24.xml" value="0.39895833333333336" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/drawable/ic_launcher_background.xml" value="0.39895833333333336" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/activity_join.xml" value="0.2390625" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/activity_login.xml" value="0.19739583333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/calendar_dialog.xml" value="0.12552083333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/calender_dialog.xml" value="0.18645833333333334" />
@@ -34,6 +38,7 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_fan_club_main.xml" value="0.25885416666666666" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_fan_club_management.xml" value="0.20104166666666667" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_fan_club_rank.xml" value="0.378125" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_page_account.xml" value="0.21875" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_page_dashboard.xml" value="0.24375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_page_fan_club.xml" value="0.38177083333333334" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/fragment_page_schedule.xml" value="0.33" />
@@ -48,6 +53,7 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_fan_club.xml" value="0.25885416666666666" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_fan_club_member.xml" value="0.3302083333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_fan_club_sign_up.xml" value="0.25" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_fan_club_symbol.xml" value="0.384375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_mission.xml" value="0.24375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_schedule.xml" value="0.3302083333333333" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_calendar.xml" value="0.20885416666666667" />
@@ -55,7 +61,9 @@
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_calendar_week.xml" value="0.13125" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/list_item_success_week_calendar.xml" value="0.159375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/mission_dialog.xml" value="0.33" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/question_dialog.xml" value="0.24375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/select_app_dialog.xml" value="0.12545289855072464" />
+        <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/select_fan_club_symbol_dialog.xml" value="0.384375" />
         <entry key="..\:/Snid/project/10_Privite/Android/CheerDiary/app/src/main/res/layout/temp.xml" value="0.24947916666666667" />
       </map>
     </option>

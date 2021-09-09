@@ -31,7 +31,6 @@
 
             <EditText
                 android:id="@+id/edit_notice"
-                android:lines="4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/button_modify_notice"
@@ -39,6 +38,7 @@
                 android:layout_marginRight="10dp"
                 android:background="@drawable/edit_rectangle"
                 android:focusable="false"
+                android:lines="4"
                 android:textColor="@color/text"
                 android:textCursorDrawable="@drawable/edit_cursor"
                 android:textSize="14sp" />

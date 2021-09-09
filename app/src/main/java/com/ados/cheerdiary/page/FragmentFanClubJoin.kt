@@ -7,13 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentFanClubJoinBinding
 import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
+import com.ados.cheerdiary.model.UserDTO
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,10 +38,17 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
     private var _binding: FragmentFanClubJoinBinding? = null
     private val binding get() = _binding!!
 
+    private var firestore : FirebaseFirestore? = null
+
     private lateinit var callback: OnBackPressedCallback
 
     lateinit var recyclerView : RecyclerView
     lateinit var recyclerViewAdapter : RecyclerViewAdapterFanClub
+
+    private var fanClubs : ArrayList<FanClubDTO> = arrayListOf()
+
+    private var selectedFanClub: FanClubDTO? = null
+    private var selectedPosition: Int? = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,23 +66,17 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
         _binding = FragmentFanClubJoinBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
 
+        firestore = FirebaseFirestore.getInstance()
+
         recyclerView = rootView.findViewById(R.id.rv_fan_club!!)as RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // 메뉴는 기본 숨김
         binding.layoutMenu.visibility = View.GONE
 
-        var datas : ArrayList<FanClubDTO> = arrayListOf()
-        datas.apply {
-            for (i in 0..100) {
-                add(FanClubDTO(false, "영웅시대", "", 10, 0.0, "홍길동", 10 ))
-                add(FanClubDTO(false, "희랑별", "", 5, 0.0, "홍길동", 7 ))
-                add(FanClubDTO(false, "우주총동원", "", 7, 0.0, "홍길동", 9 ))
-            }
-        }
+        searchFanClub()
 
-        recyclerViewAdapter = RecyclerViewAdapterFanClub(datas, this)
-        recyclerView.adapter = recyclerViewAdapter
+
 
 
         return rootView
@@ -86,6 +92,54 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
 
         binding.buttonBack.setOnClickListener {
             callBackPressed()
+        }
+
+        binding.buttonSearch.setOnClickListener {
+            val clubName = binding.searchView.query.toString()
+            Toast.makeText(activity, "검색어 $clubName", Toast.LENGTH_SHORT).show()
+            searchFanClub()
+        }
+
+        binding.buttonCancel.setOnClickListener {
+            selectRecyclerView()
+        }
+
+        binding.buttonRequest.setOnClickListener {
+            val user = (activity as MainActivity?)?.getUser()
+            firestore?.collection("fanClub")?.document(selectedFanClub?.docName.toString())?.collection("member")?.document(user?.uid.toString())?.get()?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    if (task.result.exists()) { // document 있음
+                        Toast.makeText(activity, "이미 가입 요청을 한 팬클럽 입니다!", Toast.LENGTH_SHORT).show()
+                    } else { // document 없으면 회원 가입 페이지로 이동
+                        val member = MemberDTO(false, user?.uid, user?.nickname, 0, MemberDTO.POSITION.GUEST, false)
+                        firestore?.collection("fanClub")?.document(selectedFanClub?.docName.toString())?.collection("member")?.document(user?.uid.toString())?.set(member)?.addOnCompleteListener {
+                            Toast.makeText(activity, "팬클럽 가입 요청 완료!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                selectRecyclerView()
+            }
+        }
+    }
+
+    private fun searchFanClub() {
+        var query = binding.searchView.query
+        firestore?.collection("fanClub")?.get()?.addOnCompleteListener { task ->
+            fanClubs.clear()
+            if (task.isSuccessful) {
+                for (document in task.result) {
+                    var fanClub = document.toObject(FanClubDTO::class.java)!!
+                    if (!query.isNullOrEmpty()) {
+                        if (fanClub.name!!.contains(query)) {
+                            fanClubs.add(fanClub)
+                        }
+                    } else {
+                        fanClubs.add(fanClub)
+                    }
+                }
+                recyclerViewAdapter = RecyclerViewAdapterFanClub(fanClubs, this)
+                recyclerView.adapter = recyclerViewAdapter
+            }
         }
     }
 
@@ -129,8 +183,8 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
             }
     }
 
-    override fun onItemClick(item: FanClubDTO, position: Int) {
-        if (recyclerViewAdapter?.selectItem(position)) { // 선택 일 경우 메뉴 표시 및 레이아웃 어둡게
+    private fun selectRecyclerView() {
+        if (recyclerViewAdapter?.selectItem(selectedPosition!!)) { // 선택 일 경우 메뉴 표시 및 레이아웃 어둡게
             val translateUp = AnimationUtils.loadAnimation(context, R.anim.translate_up)
             binding.layoutMenu.visibility = View.VISIBLE
             binding.layoutMenu.startAnimation(translateUp)
@@ -141,5 +195,11 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
             binding.layoutMenu.startAnimation(translateDown)
             //recyclerView.smoothSnapToPosition(position)
         }
+    }
+
+    override fun onItemClick(item: FanClubDTO, position: Int) {
+        selectedFanClub = item
+        selectedPosition = position
+        selectRecyclerView()
     }
 }
