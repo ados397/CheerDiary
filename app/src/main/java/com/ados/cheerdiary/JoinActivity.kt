@@ -10,8 +10,7 @@ import com.ados.cheerdiary.model.UserDTO
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
-
-
+import java.util.*
 
 
 class JoinActivity : AppCompatActivity() {
@@ -57,9 +56,9 @@ class JoinActivity : AppCompatActivity() {
         }
 
         binding.buttonOk.setOnClickListener {
-            var email = binding.editEmail.text.toString()
-            var nickname = binding.editNickname.text.toString()
-            var password = binding.editPassword.text.toString()
+            var email = binding.editEmail.text.toString().trim()
+            var nickname = binding.editNickname.text.toString().trim()
+            var password = binding.editPassword.text.toString().trim()
 
             firestore?.collection("user")?.get()?.addOnCompleteListener { task ->
                 if(task.isSuccessful){
@@ -78,11 +77,11 @@ class JoinActivity : AppCompatActivity() {
                     }
 
                     if (userDTO != null) { // null 이 아니라면 소셜 로그인, 이미 로그인 처리는 되어 있음, firestore에 데이터 기록 후 메인페이지 이동
-                        writeFirestoreAndFinish(UserDTO(firebaseAuth?.currentUser?.uid, email, userDTO?.loginType, nickname, null))
+                        writeFirestoreAndFinish(UserDTO(firebaseAuth?.currentUser?.uid, email, userDTO?.loginType, nickname, 1, 0.0, null, null, "", "", Date()))
                     } else {
                         firebaseAuth?.createUserWithEmailAndPassword(email, password)?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                writeFirestoreAndFinish(UserDTO(firebaseAuth?.currentUser?.uid, email, UserDTO.LoginType.EMAIL, nickname, null))
+                                writeFirestoreAndFinish(UserDTO(firebaseAuth?.currentUser?.uid, email, UserDTO.LoginType.EMAIL, nickname, 1, 0.0, null, null, "", "", Date()))
                             } else if (!task.exception?.message.isNullOrEmpty()) {
                                 Toast.makeText(this, "회원가입에 실패하였습니다. 잠시 후 다시 시도해 보세요.", Toast.LENGTH_SHORT).show()
                                 //Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -158,7 +157,7 @@ class JoinActivity : AppCompatActivity() {
 
         binding.editPassword.doAfterTextChanged {
             if (!isValidPassword(binding.editPassword.text.toString())) {
-                binding.textPasswordError.text = "비밀번호는 6자 이상 숫자, 문자, 특수문자 중 2가지가 포함되어야 합니다."
+                binding.textPasswordError.text = "비밀번호는 6자 이상 숫자, 영문, 특수문자 중 2가지가 포함되어야 합니다."
                 binding.editPassword.setBackgroundResource(R.drawable.edit_rectangle_red)
                 passwordOK = false
             } else {
@@ -198,7 +197,7 @@ class JoinActivity : AppCompatActivity() {
             if (binding.editNickname.text.toString().isEmpty())
                 nicknameOK = false
 
-            binding.textNicknameLen.text = "${binding.editNickname.text.length}/25"
+            binding.textNicknameLen.text = "${binding.editNickname.text.length}/15"
 
             visibleOkButton()
         }
@@ -207,7 +206,10 @@ class JoinActivity : AppCompatActivity() {
     private fun writeFirestoreAndFinish(user: UserDTO) {
         firestore?.collection("user")?.document(user.uid.toString())?.set(user)?.addOnCompleteListener {
             Toast.makeText(this, "회원가입이 완료 되었습니다.", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, MainActivity::class.java))
+            var intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("user", user)
+            startActivity(intent)
+
             finish()
         }
     }
@@ -224,12 +226,28 @@ class JoinActivity : AppCompatActivity() {
         }
     }
 
+    private fun isKorean(s: String): Boolean {
+        var i = 0
+        while (i < s.length) {
+            val c = s.codePointAt(i)
+            if (c in 0xAC00..0xD800)
+                return true
+            i += Character.charCount(c)
+        }
+        return false
+    }
+
+
     private fun isValidPassword(password: String) : Boolean {
+        if (password.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*\$".toRegex())) {
+            return false
+        }
+
         return password.matches("^(?=.*[a-zA-Z0-9])(?=.*[a-zA-Z!@#\$%^&*])(?=.*[0-9~!@#\$%^&*]).{6,30}\$".toRegex())
     }
 
     private fun isValidNickname(nickname: String) : Boolean {
-        val exp = Regex("^[가-힣ㄱ-ㅎa-zA-Z0-9.~!@#\$%^&*\\[\\](){}|_-]{1,30}\$")
+        val exp = Regex("^[가-힣ㄱ-ㅎa-zA-Z0-9.~!@#\$%^&*\\[\\](){}|_-]{1,15}\$")
         return !nickname.isNullOrEmpty() && exp.matches(nickname)
     }
 

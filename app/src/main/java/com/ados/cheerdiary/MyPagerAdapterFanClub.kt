@@ -2,24 +2,38 @@ package com.ados.cheerdiary
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
 import com.ados.cheerdiary.page.*
 
-class MyPagerAdapterFanClub(fa: FragmentActivity) : FragmentStateAdapter(fa) {
-    private val NUM_PAGES = 3
+//class MyPagerAdapterFanClub(fa: FragmentActivity, fanClub: FanClubDTO, member: MemberDTO) : FragmentStateAdapter(fa) {
+class MyPagerAdapterFanClub(fm: FragmentManager, life: Lifecycle, fanClub: FanClubDTO, member: MemberDTO) : FragmentStateAdapter(fm, life) {
+    private val NUM_PAGES = 5
+    private val fanClubDTO = fanClub
+    private val memberDTO = member
 
-    override fun getItemCount(): Int  = NUM_PAGES
+    override fun getItemCount(): Int = NUM_PAGES
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> {
-                FragmentFanClubInfo.newInstance("Page1", "")
+                FragmentFanClubInfo.newInstance(fanClubDTO, memberDTO)
             }
             1 -> {
-                FragmentFanClubRank.newInstance("Page2", "")
+                FragmentFanClubMember.newInstance(fanClubDTO, memberDTO)
+            }
+            2 -> {
+                FragmentFanClubRank.newInstance(fanClubDTO, memberDTO)
+            }
+            3 -> {
+                FragmentFanClubManagement.newInstance(fanClubDTO, memberDTO)
             }
             else -> {
-                FragmentFanClubManagement.newInstance("Page4", "")
+                //FragmentFanClubSchedule.newInstance(fanClubDTO!!, fanClubDTO!!)
+                FragmentPageSchedule.newInstance(fanClubDTO, memberDTO)
             }
         }
     }

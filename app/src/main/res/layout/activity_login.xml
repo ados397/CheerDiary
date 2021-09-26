@@ -29,8 +29,12 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="5dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
+            android:maxLines="1"
+            android:inputType="text"
+            android:nextFocusDown="@id/edit_password"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/edit_password"
@@ -43,8 +47,9 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="5dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/button_login"
@@ -74,6 +79,7 @@
                     android:layout_height="24dp"/>
                 <TextView
                     android:text="로그인"
+                    android:fontFamily="@font/font"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"
@@ -109,6 +115,7 @@
                     android:layout_height="24dp"/>
                 <TextView
                     android:text="회원가입"
+                    android:fontFamily="@font/font"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"
@@ -144,6 +151,7 @@
                     android:layout_height="24dp"/>
                 <TextView
                     android:text="Google 계정으로 로그인 하기"
+                    android:fontFamily="@font/font"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"
@@ -178,6 +186,7 @@
                     android:layout_height="24dp"/>
                 <TextView
                     android:text="Facebook 계정으로 로그인 하기"
+                    android:fontFamily="@font/font"
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:layout_width="wrap_content"

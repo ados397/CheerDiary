@@ -28,29 +28,36 @@ class QuestionDialog(context: Context, var question: QuestionDTO) : Dialog(conte
             QuestionDTO.STAT.WARNING -> binding.imgStat.setImageResource(R.drawable.warning)
             QuestionDTO.STAT.ERROR -> binding.imgStat.setImageResource(R.drawable.error)
         }
+
+        if (!question.image.isNullOrEmpty()) {
+            var imageID = context.resources.getIdentifier(question.image, "drawable", context.packageName)
+            if (imageID != null) {
+                binding.imgStat.setImageResource(imageID)
+            }
+        }
     }
 
     fun setButtonOk(name: String) {
-        binding.buttonOk.text = name
+        binding.buttonQuestionOk.text = name
     }
 
     fun setButtonCancel(name: String) {
-        binding.buttonCancel.text = name
+        binding.buttonQuestionCancel.text = name
     }
 
     fun showButtonOk(visible: Boolean) {
         if (visible == true) {
-            binding.buttonOk.visibility = View.VISIBLE
+            binding.buttonQuestionOk.visibility = View.VISIBLE
         } else {
-            binding.buttonOk.visibility = View.GONE
+            binding.buttonQuestionOk.visibility = View.GONE
         }
     }
 
     fun showButtonCancel(visible: Boolean) {
         if (visible == true) {
-            binding.buttonCancel.visibility = View.VISIBLE
+            binding.buttonQuestionCancel.visibility = View.VISIBLE
         } else {
-            binding.buttonCancel.visibility = View.GONE
+            binding.buttonQuestionCancel.visibility = View.GONE
         }
     }
 

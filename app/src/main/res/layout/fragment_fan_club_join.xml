@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     tools:context=".page.FragmentFanClubJoin">
 
     <RelativeLayout
@@ -36,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/button_back"
+            android:fontFamily="@font/font"
             android:text="팬클럽 가입"
             android:textColor="@color/text"
             android:textSize="20sp" />
@@ -45,6 +47,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_below="@+id/layout_title"
+        android:layout_above="@+id/layout_menu"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -52,19 +55,25 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
-                app:queryHint="팬클럽명을 입력하세요."
-                app:iconifiedByDefault="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/button_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Button
+                android:fontFamily="@font/font"
+                app:iconifiedByDefault="false"
+                app:queryHint="팬클럽명을 입력하세요." />
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_search"
-                android:text="검색"
-                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/btn_round4"
+                android:fontFamily="@font/font"
+                android:text="검색"
+                android:textColor="@color/text" />
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -76,29 +85,204 @@
 
     <LinearLayout
         android:id="@+id/layout_menu"
-        android:orientation="vertical"
-        android:background="#DDDDDDDD"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#DDDDDDDD"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:backgroundTint="#FFFFFF"
+            card_view:cardCornerRadius="10dp">
+
+            <RelativeLayout
+                android:id="@+id/layout_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/img_symbol"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/reward_icon_25" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/text_level"
+                                    android:fontFamily="@font/font"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="3dp"
+                                    android:background="@drawable/btn_round5"
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp"
+                                    android:textColor="@color/white"
+                                    android:text="Lv. 99"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/text_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:layout_marginBottom="2dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/font"
+                                    android:maxLines="1"
+                                    android:textColor="@color/text"
+                                    android:text="팬클럽 명"
+                                    android:textSize="16sp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:weightSum="10">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="6"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:id="@+id/img_position"
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/medal_icon_09" />
+
+                                    <TextView
+                                        android:id="@+id/text_master"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="3dp"
+                                        android:ellipsize="end"
+                                        android:fontFamily="@font/font"
+                                        android:maxLines="1"
+                                        android:textColor="@color/text"
+                                        android:text="홍길동" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="4"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/family" />
+
+                                    <TextView
+                                        android:id="@+id/text_count"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:layout_marginLeft="5dp"
+                                        android:fontFamily="@font/font"
+                                        android:textColor="@color/text"
+                                        android:text="3/10" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/text_description"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/btn_round5"
+                                    android:paddingLeft="5dp"
+                                    android:paddingRight="5dp"
+                                    android:layout_marginRight="5dp"
+                                    android:layout_marginBottom="2dp"
+                                    android:textColor="@color/white"
+                                    android:fontFamily="@font/font"
+                                    android:text="팬클럽 소개" />
+
+                                <EditText
+                                    android:id="@+id/edit_description"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@id/text_description"
+                                    android:layout_marginLeft="10dp"
+                                    android:layout_marginRight="10dp"
+                                    android:background="@drawable/edit_rectangle"
+                                    android:focusable="false"
+                                    android:fontFamily="@font/font"
+                                    android:maxLines="10"
+                                    android:scrollbars="vertical"
+                                    android:textColor="@color/text"
+                                    android:textCursorDrawable="@drawable/edit_cursor"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_request"
-            android:text="가입 요청"
-            android:background="@drawable/btn_ripple"
-            android:textColor="#0090FF"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/btn_ripple"
+            android:fontFamily="@font/font"
+            android:text="가입 요청"
+            android:textColor="#0090FF" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_cancel"
-            android:text="취소"
-            android:background="@drawable/btn_ripple2"
-            android:textColor="#FF0077"
-            android:layout_margin="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/btn_ripple2"
+            android:fontFamily="@font/font"
+            android:text="취소"
+            android:textColor="#FF0077" />
 
     </LinearLayout>
 

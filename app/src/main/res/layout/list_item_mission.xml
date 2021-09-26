@@ -7,28 +7,55 @@
 
     <androidx.cardview.widget.CardView
         card_view:cardCornerRadius="10dp"
-        android:backgroundTint="#D9FFFA"
-        android:layout_margin="5dp"
+        android:backgroundTint="#FFFFFF"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/layout_percent"
+            android:orientation="horizontal"
+            android:background="#FF0000"
+            android:layout_margin="-10dp"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"/>
 
         <RelativeLayout
             android:id="@+id/layout_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/text_title"
-                android:text="타이틀"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:paddingLeft="15dp"
-                android:paddingTop="10dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="10dp"
-                android:layout_toLeftOf="@+id/layout_progress"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/layout_progress"
+                android:ellipsize="end"
+                android:fontFamily="@font/font"
+                android:maxLines="1"
+                android:paddingLeft="20dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:text="타이틀"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/text_period"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_title"
+                android:fontFamily="@font/font"
+                android:paddingLeft="23dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="5dp"
+                android:text="09월 30일 까지"
+                android:textColor="@color/text_sub"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/layout_progress"
@@ -40,13 +67,14 @@
                 <TextView
                     android:id="@+id/text_count"
                     android:text="3/10"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/font"
                     android:layout_gravity="center"
                     android:layout_marginRight="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-                <LinearLayout
-                    android:orientation="vertical"
+                <RelativeLayout
                     android:layout_marginRight="15dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -55,17 +83,28 @@
                         android:id="@+id/progress_percent"
                         android:max="100"
                         android:progress="50"
-                        android:layout_gravity="center"
+                        android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
                         android:id="@+id/text_percent"
                         android:text="50%"
-                        android:layout_gravity="center"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/font"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@+id/progress_percent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
-                </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/img_complete"
+                        android:src="@drawable/complete"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"/>
+                </RelativeLayout>
             </LinearLayout>
         </RelativeLayout>
 

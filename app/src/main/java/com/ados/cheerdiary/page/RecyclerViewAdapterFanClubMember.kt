@@ -1,15 +1,23 @@
 package com.ados.cheerdiary.page
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.ListItemFanClubMemberBinding
 import com.ados.cheerdiary.model.MemberDTO
+import java.text.DecimalFormat
 
 class RecyclerViewAdapterFanClubMember(private val items: ArrayList<MemberDTO>, var clickListener: OnFanClubMemberItemClickListener) : RecyclerView.Adapter<RecyclerViewAdapterFanClubMember.ViewHolder>() {
 
+    var decimalFormat: DecimalFormat = DecimalFormat("###,###")
+    var context: Context? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        context = parent.context
         val view = ListItemFanClubMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(view)
     }
@@ -23,13 +31,24 @@ class RecyclerViewAdapterFanClubMember(private val items: ArrayList<MemberDTO>, 
 
         items[position].let { item ->
             with(holder) {
-                name.text = "${item.userNickname}"
-                contribution.text = "기여도 : ${item.contribution}"
+                name.text = item.userNickname
+                level.text = "Lv. ${item.userLevel}"
+                contribution.text = "기여도 : ${decimalFormat.format(item.contribution)}"
+                aboutMe.text = item.userAboutMe
 
                 imagePosition.setImageResource(item.getPositionImage())
                 positionText.text = item.getPositionString()
 
                 imageCheckout.setImageResource(item.getCheckoutImage())
+
+                when (item.position) {
+                    MemberDTO.POSITION.MASTER -> layoutPosition.setBackgroundColor(ContextCompat.getColor(context!!, R.color.master))
+                    MemberDTO.POSITION.SUB_MASTER -> layoutPosition.setBackgroundColor(ContextCompat.getColor(context!!, R.color.sub_master))
+                    MemberDTO.POSITION.MEMBER -> layoutPosition.setBackgroundColor(ContextCompat.getColor(context!!, R.color.member))
+                    //MemberDTO.POSITION.MASTER -> layoutPosition.setBackgroundColor(Color.parseColor("#FFD500"))
+                    //MemberDTO.POSITION.SUB_MASTER -> layoutPosition.setBackgroundColor(Color.parseColor("#FF8C00"))
+                    //MemberDTO.POSITION.MEMBER -> layoutPosition.setBackgroundColor(Color.parseColor("#0099FF"))
+                }
 
                 if (item.isSelected) {
                     mainLayout.setBackgroundColor(Color.parseColor("#BBD5F8"))
@@ -59,10 +78,13 @@ class RecyclerViewAdapterFanClubMember(private val items: ArrayList<MemberDTO>, 
     inner class ViewHolder(private val viewBinding: ListItemFanClubMemberBinding) : RecyclerView.ViewHolder(viewBinding.root) {
         var imagePosition = viewBinding.imgPosition
         var name = viewBinding.textName
+        var level = viewBinding.textLevel
         var contribution = viewBinding.textContribution
         var positionText = viewBinding.textPosition
+        var aboutMe = viewBinding.textAboutMe
         var mainLayout = viewBinding.layoutMain
         var imageCheckout = viewBinding.imgCheckout
+        var layoutPosition = viewBinding.layoutPosition
 
         fun initializes(item: MemberDTO, action:OnFanClubMemberItemClickListener) {
             viewBinding.layoutMain.setOnClickListener {

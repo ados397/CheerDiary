@@ -2,12 +2,21 @@ package com.ados.cheerdiary.page
 
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MotionEventCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.ListItemScheduleBinding
 import com.ados.cheerdiary.model.ScheduleDTO
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-class RecyclerViewAdapterSchedule(private val items: ArrayList<ScheduleDTO>, var clickListener: OnScheduleItemClickListener) : RecyclerView.Adapter<RecyclerViewAdapterSchedule.ViewHolder>() {
+class RecyclerViewAdapterSchedule(private val items: ArrayList<ScheduleDTO>, private val clickListener: OnScheduleItemClickListener, private val startDragListener: OnStartDragListener) : RecyclerView.Adapter<RecyclerViewAdapterSchedule.ViewHolder>(), SwipeHelperCallback.OnItemMoveListener {
+
+    var showReorderIcon : Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ListItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,11 +28,26 @@ class RecyclerViewAdapterSchedule(private val items: ArrayList<ScheduleDTO>, var
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.initializes(items[position], clickListener)
+        holder.initializes(holder, items[position])
 
         items[position].let { item ->
             with(holder) {
+                no.text = "${position + 1}"
                 title.text = "${item.title}"
+                range.text = "${SimpleDateFormat("yyyy.MM.dd").format(item.startDate)} ~ ${SimpleDateFormat("yyyy.MM.dd").format(item.endDate)}"
+
+                when (item.cycle) {
+                    ScheduleDTO.CYCLE.DAY -> imgScheduleType.setImageResource(R.drawable.schedule_day)
+                    ScheduleDTO.CYCLE.WEEK -> imgScheduleType.setImageResource(R.drawable.schedule_week)
+                    ScheduleDTO.CYCLE.MONTH -> imgScheduleType.setImageResource(R.drawable.schedule_month)
+                    ScheduleDTO.CYCLE.PERIOD -> imgScheduleType.setImageResource(R.drawable.schedule_period)
+                }
+
+                if (showReorderIcon) {
+                    imgReorder.visibility = View.VISIBLE
+                } else {
+                    imgReorder.visibility = View.GONE
+                }
 
                 if (item.isSelected) {
                     mainLayout.setBackgroundColor(Color.parseColor("#BBD5F8"))
@@ -50,13 +74,34 @@ class RecyclerViewAdapterSchedule(private val items: ArrayList<ScheduleDTO>, var
         }
     }
 
-    inner class ViewHolder(private val viewBinding: ListItemScheduleBinding) : RecyclerView.ViewHolder(viewBinding.root) {
-        var title = viewBinding.textTitle
-        var mainLayout = viewBinding.layoutMain
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+        val fromOrder = items[fromPosition].order
+        val toOrder = items[toPosition].order
 
-        fun initializes(item: ScheduleDTO, action:OnScheduleItemClickListener) {
+        items[fromPosition].order = toOrder
+        items[toPosition].order = fromOrder
+
+        Collections.swap(items, fromPosition, toPosition)
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    inner class ViewHolder(private val viewBinding: ListItemScheduleBinding) : RecyclerView.ViewHolder(viewBinding.root) {
+        var no = viewBinding.textNo
+        var title = viewBinding.textTitle
+        var range = viewBinding.textRange
+        var imgScheduleType = viewBinding.imgScheduleType
+        var mainLayout = viewBinding.layoutMain
+        var imgReorder = viewBinding.imgReorder
+
+        fun initializes(holder: ViewHolder, item: ScheduleDTO) {
             viewBinding.layoutItem.setOnClickListener {
-                action.onItemClick(item, adapterPosition)
+                clickListener.onItemClick(item, adapterPosition)
+            }
+            viewBinding.imgReorder.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    startDragListener.onStartDrag(holder)
+                }
+                return@setOnTouchListener true
             }
         }
     }
@@ -66,4 +111,8 @@ class RecyclerViewAdapterSchedule(private val items: ArrayList<ScheduleDTO>, var
 
 interface OnScheduleItemClickListener {
     fun onItemClick(item: ScheduleDTO, position: Int)
+}
+
+interface OnStartDragListener {
+    fun onStartDrag(holder: RecyclerViewAdapterSchedule.ViewHolder)
 }

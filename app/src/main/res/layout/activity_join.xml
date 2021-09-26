@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/button_back"
+            android:fontFamily="@font/font"
             android:text="회원 가입"
             android:textColor="@color/text"
             android:textSize="20sp" />
@@ -47,7 +48,6 @@
         android:layout_height="match_parent"
         android:layout_above="@id/layout_ok"
         android:layout_below="@id/layout_title"
-        android:layout_margin="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
@@ -59,9 +59,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text="이메일"
             android:textColor="@color/text"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/edit_email"
@@ -70,10 +71,11 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
             android:hint="이메일 주소 입력"
             android:textColor="@color/text"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/text_email_error"
@@ -81,18 +83,20 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text=""
-            android:textColor="#FF0000"
-            android:textSize="10sp" />
+            android:textColor="@color/text_red"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/text_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text="비밀번호"
             android:textColor="@color/text"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/edit_password"
@@ -101,11 +105,13 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
             android:hint="비밀번호 입력"
             android:inputType="textPassword"
+            android:maxLength="30"
             android:textColor="@color/text"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/text_password_error"
@@ -113,18 +119,20 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text=""
-            android:textColor="#FF0000"
-            android:textSize="10sp" />
+            android:textColor="@color/text_red"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/text_password_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text="비밀번호 확인"
             android:textColor="@color/text"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/edit_password_confirm"
@@ -133,11 +141,13 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
             android:hint="비밀번호 한번 더 입력"
             android:inputType="textPassword"
+            android:maxLength="30"
             android:textColor="@color/text"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/text_password_confirm_error"
@@ -145,18 +155,20 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text=""
-            android:textColor="#FF0000"
-            android:textSize="10sp" />
+            android:textColor="@color/text_red"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/text_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/font"
             android:text="닉네임"
             android:textColor="@color/text"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/edit_nickname"
@@ -165,32 +177,36 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/edit_rectangle"
+            android:fontFamily="@font/font"
             android:hint="닉네임 입력"
-            android:maxLength="25"
+            android:maxLength="15"
             android:textColor="@color/text"
             android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/text_nickname_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginBottom="5dp"
+                android:fontFamily="@font/font"
                 android:text=""
-                android:textColor="#FF0000"
-                android:textSize="10sp" />
+                android:textColor="@color/text_red"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/text_nickname_len"
-                android:layout_alignParentRight="true"
-                android:text="0/25"
-                android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/font"
+                android:text="0/15" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -211,6 +227,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
+            android:fontFamily="@font/font"
             android:text="회원 가입" />
     </RelativeLayout>
 

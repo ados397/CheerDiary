@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/img_icon"
+        android:id="@+id/img_symbol"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="12dp"
@@ -21,20 +21,21 @@
 
     <TextView
         android:id="@+id/text_app_name"
+        android:fontFamily="@font/font"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="12sp"
-        android:textStyle="bold"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_icon"
+        app:layout_constraintTop_toBottomOf="@+id/img_symbol"
         tools:text="Title" />
 
     <TextView
         android:id="@+id/text_blank"
+        android:fontFamily="@font/font"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="5sp"

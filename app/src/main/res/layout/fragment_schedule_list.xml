@@ -10,14 +10,18 @@
         android:id="@+id/layout_title"
         android:layout_width="wrap_content"
         android:layout_height="40dp">
+
         <TextView
-            android:text="스케줄 관리"
-            android:textSize="20sp"
-            android:textColor="@color/text"
+            android:id="@+id/text_page_title"
+            android:fontFamily="@font/font"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:text="스케줄 관리"
+            android:textColor="@color/text"
+            android:textSize="20sp" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/button_add_schedule"
             app:cardElevation="0dp"
@@ -25,9 +29,9 @@
             android:backgroundTint="@android:color/transparent"
             android:clickable="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/button_reorder"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -35,6 +39,26 @@
                 android:src="@drawable/add_schedule"
                 android:layout_width="30dp"
                 android:layout_height="30dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/button_reorder"
+            app:cardElevation="0dp"
+            app:rippleColor="#fff"
+            android:backgroundTint="@android:color/transparent"
+            android:clickable="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/arrow_change"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -54,25 +78,62 @@
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_modify"
-            android:text="수정"
-            android:background="@drawable/btn_ripple"
-            android:textColor="#0090FF"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
+        <LinearLayout
+            android:id="@+id/layout_menu_modify"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_delete"
-            android:text="삭제"
-            android:background="@drawable/btn_ripple2"
-            android:textColor="#FF0077"
-            android:layout_margin="10dp"
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_modify"
+                android:fontFamily="@font/font"
+                android:text="수정"
+                android:background="@drawable/btn_ripple"
+                android:textColor="#0090FF"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_delete"
+                android:fontFamily="@font/font"
+                android:text="삭제"
+                android:background="@drawable/btn_ripple2"
+                android:textColor="#FF0077"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_menu_reorder"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_ok"
+                android:fontFamily="@font/font"
+                android:text="완료"
+                android:background="@drawable/btn_ripple"
+                android:textColor="#0090FF"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_cancel"
+                android:fontFamily="@font/font"
+                android:text="취소"
+                android:background="@drawable/btn_ripple2"
+                android:textColor="#FF0077"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
 
     </LinearLayout>
+
+
 
 </RelativeLayout>

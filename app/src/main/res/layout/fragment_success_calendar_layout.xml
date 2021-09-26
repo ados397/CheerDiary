@@ -32,6 +32,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:fontFamily="@font/font"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -52,6 +53,7 @@
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/text_tab_day"
+            android:fontFamily="@font/font"
             android:text="일일"
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -64,6 +66,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/text_tab_week"
+            android:fontFamily="@font/font"
             android:text="주간"
             android:textColor="@color/black"
             android:textSize="12sp"
@@ -75,6 +78,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/text_tab_month"
+            android:fontFamily="@font/font"
             android:text="월간"
             android:textColor="@color/black"
             android:textSize="12sp"

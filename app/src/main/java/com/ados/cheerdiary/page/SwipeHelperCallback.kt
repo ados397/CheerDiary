@@ -4,13 +4,27 @@ import android.graphics.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class SwipeHelperCallback: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+//class SwipeHelperCallback: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
+class SwipeHelperCallback(private val itemMoveListener: OnItemMoveListener): ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+
+    interface OnItemMoveListener {
+        fun onItemMove(fromPosition: Int, toPosition: Int)
+    }
+
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
+        itemMoveListener.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+
         return true
+    }
+
+    // 롱 클릭으로 드래그 차단
+    override fun isLongPressDragEnabled(): Boolean {
+        //return super.isLongPressDragEnabled()
+        return false
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

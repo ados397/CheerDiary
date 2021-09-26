@@ -120,7 +120,8 @@ class FragmentSuccessCalendarLayout : Fragment() {
     }
 
     private fun setPagerAdapter(pageIndex: Int) {
-        binding.viewpager.adapter = MyPagerAdapterSuccessCalendar(context as FragmentActivity, pageIndex)
+        //binding.viewpager.adapter = MyPagerAdapterSuccessCalendar(context as FragmentActivity, pageIndex)
+        binding.viewpager.adapter = MyPagerAdapterSuccessCalendar(childFragmentManager, viewLifecycleOwner.lifecycle, pageIndex)
         binding.viewpager.currentItem = Int.MAX_VALUE / 2
     }
 

@@ -7,11 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentPageAccountBinding
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
+import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,21 +22,17 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentPageAccount : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
     private var _binding: FragmentPageAccountBinding? = null
     private val binding get() = _binding!!
 
-    private var firebaseAuth : FirebaseAuth? = null
-
-    private var googleSignInClient : GoogleSignInClient? = null
+    private var fanClubDTO: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fanClubDTO = it.getParcelable(ARG_PARAM1)
+            currentMember = it.getParcelable(ARG_PARAM2)
         }
     }
 
@@ -51,7 +44,8 @@ class FragmentPageAccount : Fragment() {
         _binding = FragmentPageAccountBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
 
-        firebaseAuth = FirebaseAuth.getInstance()
+        val fragment = FragmentAccountInfo.newInstance(fanClubDTO, currentMember)
+        childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
 
         return rootView
     }
@@ -64,19 +58,7 @@ class FragmentPageAccount : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN) //기본 로그인 방식 사용
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(context,gso)
 
-        binding.buttonLogout.setOnClickListener {
-            firebaseAuth?.signOut()
-            //Auth.GoogleSignInApi.signOut()
-            googleSignInClient?.signOut()?.addOnCompleteListener {
-
-            }
-        }
 
     }
 
@@ -90,11 +72,12 @@ class FragmentPageAccount : Fragment() {
          * @return A new instance of fragment FragmentPageAccount.
          */
         // TODO: Rename and change types and number of parameters
-        @JvmStatic fun newInstance(param1: String, param2: String) =
+        @JvmStatic
+        fun newInstance(param1: FanClubDTO?, param2: MemberDTO?) =
                 FragmentPageAccount().apply {
                     arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
+                        putParcelable(ARG_PARAM1, param1)
+                        putParcelable(ARG_PARAM2, param2)
                     }
                 }
     }

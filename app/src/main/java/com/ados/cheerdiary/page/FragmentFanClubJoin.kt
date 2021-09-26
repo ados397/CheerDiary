@@ -1,14 +1,19 @@
 package com.ados.cheerdiary.page
 
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.EditText
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +23,13 @@ import com.ados.cheerdiary.databinding.FragmentFanClubJoinBinding
 import com.ados.cheerdiary.model.FanClubDTO
 import com.ados.cheerdiary.model.MemberDTO
 import com.ados.cheerdiary.model.UserDTO
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -90,14 +101,18 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // SearchView 폰트 변경
+        val typeface = ResourcesCompat.getFont(requireContext(), R.font.uhbee_zziba_regular)
+        val editText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        editText.typeface = typeface
+
         binding.buttonBack.setOnClickListener {
             callBackPressed()
         }
 
         binding.buttonSearch.setOnClickListener {
-            val clubName = binding.searchView.query.toString()
-            Toast.makeText(activity, "검색어 $clubName", Toast.LENGTH_SHORT).show()
             searchFanClub()
+            closeLayout()
         }
 
         binding.buttonCancel.setOnClickListener {
@@ -111,7 +126,7 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
                     if (task.result.exists()) { // document 있음
                         Toast.makeText(activity, "이미 가입 요청을 한 팬클럽 입니다!", Toast.LENGTH_SHORT).show()
                     } else { // document 없으면 회원 가입 페이지로 이동
-                        val member = MemberDTO(false, user?.uid, user?.nickname, 0, MemberDTO.POSITION.GUEST, false)
+                        val member = MemberDTO(false, user?.uid, user?.nickname, user?.level, user?.aboutMe, 0, MemberDTO.POSITION.GUEST, Date(), null, false)
                         firestore?.collection("fanClub")?.document(selectedFanClub?.docName.toString())?.collection("member")?.document(user?.uid.toString())?.set(member)?.addOnCompleteListener {
                             Toast.makeText(activity, "팬클럽 가입 요청 완료!", Toast.LENGTH_SHORT).show()
                         }
@@ -124,7 +139,25 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
 
     private fun searchFanClub() {
         var query = binding.searchView.query
-        firestore?.collection("fanClub")?.get()?.addOnCompleteListener { task ->
+        var collection: Query? = null
+
+        collection = if (query.isNullOrEmpty()) { // 검색어가 없을 경우 랜덤으로 팬클럽 표시
+            // 팬클럽 생성 시간이 특정날짜 기준 이하인 팬클럽을 랜덤으로 획득
+            // 오늘날짜 - 팬클럽 15개 이상 생성된 날짜 중 랜덤 값
+            val startDate = SimpleDateFormat("yyyyMMdd").parse("20210905").time
+            val calendar= Calendar.getInstance()
+            val range = ((calendar.time.time - startDate) / (24 * 60 * 60 * 1000)).toInt()
+            val random = Random.nextInt(0, range)
+            calendar.add(Calendar.DATE, -random)
+
+            println("랜덤 : $random, 레인지 : $range, ${calendar.time}, $calendar")
+
+            firestore?.collection("fanClub")?.whereLessThan("createTime", calendar.time)?.limit(15)
+        } else { // 검색어에 해당하는 팬클럽 표시
+            firestore?.collection("fanClub")
+        }
+        //firestore?.collection("fanClub")?.get()?.addOnCompleteListener { task ->
+        collection?.get()?.addOnCompleteListener { task ->
             fanClubs.clear()
             if (task.isSuccessful) {
                 for (document in task.result) {
@@ -163,6 +196,21 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
         }
     }
 
+    private fun setSelectFanClubInfo() {
+        if (selectedFanClub != null) {
+            var imageID = requireContext().resources.getIdentifier(selectedFanClub?.imgSymbol, "drawable", requireContext().packageName)
+            if (imageID > 0) {
+                binding.imgSymbol.setImageResource(imageID)
+            }
+
+            binding.textName.text = selectedFanClub?.name
+            binding.textLevel.text = "Lv. ${selectedFanClub?.level}"
+            binding.textMaster.text = selectedFanClub?.masterNickname
+            binding.textCount.text = "${selectedFanClub?.count}/${selectedFanClub?.countMax}"
+            binding.editDescription.setText(selectedFanClub?.description)
+        }
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -183,23 +231,36 @@ class FragmentFanClubJoin : Fragment(), OnFanClubItemClickListener {
             }
     }
 
+    private fun openLayout() {
+        if (binding.layoutMenu.visibility == View.GONE) {
+            val translateUp = AnimationUtils.loadAnimation(context, R.anim.translate_up)
+            binding.layoutMenu.startAnimation(translateUp)
+        }
+        binding.layoutMenu.visibility = View.VISIBLE
+        //recyclerView.smoothSnapToPosition(position)
+    }
+
+    private fun closeLayout() {
+        if (binding.layoutMenu.visibility == View.VISIBLE) {
+            val translateDown = AnimationUtils.loadAnimation(context, R.anim.translate_down)
+            binding.layoutMenu.startAnimation(translateDown)
+        }
+        binding.layoutMenu.visibility = View.GONE
+        //recyclerView.smoothSnapToPosition(position)
+    }
+
     private fun selectRecyclerView() {
         if (recyclerViewAdapter?.selectItem(selectedPosition!!)) { // 선택 일 경우 메뉴 표시 및 레이아웃 어둡게
-            val translateUp = AnimationUtils.loadAnimation(context, R.anim.translate_up)
-            binding.layoutMenu.visibility = View.VISIBLE
-            binding.layoutMenu.startAnimation(translateUp)
-            //recyclerView.smoothSnapToPosition(position)
+            openLayout()
         } else { // 해제 일 경우 메뉴 숨김 및 레이아웃 밝게
-            val translateDown = AnimationUtils.loadAnimation(context, R.anim.translate_down)
-            binding.layoutMenu.visibility = View.GONE
-            binding.layoutMenu.startAnimation(translateDown)
-            //recyclerView.smoothSnapToPosition(position)
+            closeLayout()
         }
     }
 
     override fun onItemClick(item: FanClubDTO, position: Int) {
         selectedFanClub = item
         selectedPosition = position
+        setSelectFanClubInfo()
         selectRecyclerView()
     }
 }

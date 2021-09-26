@@ -11,33 +11,29 @@
 
     <LinearLayout
         android:id="@+id/layout_menu"
-        android:background="#E53E51"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/dialog"
+        android:orientation="horizontal">
+
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
-        <Button
-            android:id="@+id/button_ok"
-            android:text="확인"
-            android:textColor="#ddffffff"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/button_symbol_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="center"
             android:layout_marginTop="7dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"/>
-        <Button
-            android:id="@+id/button_cancel"
+            android:background="@drawable/btn_round4"
+            android:fontFamily="@font/font"
             android:text="취소"
-            android:textColor="#ddffffff"
-            android:layout_marginTop="7dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"/>
+            android:textColor="@color/text" />
+
     </LinearLayout>
 
 </RelativeLayout>

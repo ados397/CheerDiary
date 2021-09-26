@@ -22,6 +22,7 @@
             android:layout_height="25dp"/>
         <TextView
             android:id="@+id/text_day"
+            android:fontFamily="@font/font"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="1"

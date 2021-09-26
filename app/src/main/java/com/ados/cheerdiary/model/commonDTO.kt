@@ -3,14 +3,22 @@ package com.ados.cheerdiary.model
 import com.ados.cheerdiary.R
 import java.util.*
 
-data class QuestionDTO(var stat: STAT? = STAT.INFO,
-                       var title: String? = null,
-                       var content: String? = null
+data class QuestionDTO(val stat: STAT? = STAT.INFO,
+                       val title: String? = null,
+                       val content: String? = null,
+                       val image: String? = null,
 ) {
     enum class STAT {
         INFO, WARNING, ERROR
     }
 }
+
+data class EditTextDTO(val title: String? = null,
+                       val content: String? = null,
+                       val length: Int? = 0,
+                       val regex: String? = null,
+                       val regexErrorMsg: String? = null
+) { }
 
 data class CalendarDTO(
     var StartDate: Boolean = false,

@@ -121,7 +121,7 @@ class SuccessCalendarWeek(date: Date) {
         } else { // 1일이 저번달 마지막주에 포함
             for (i in 1..7) { // 월요일을 찾아서 1째주 시작날짜로 지정
                 calendar.add(Calendar.DATE, 1)
-                //println("월요일 찾기 ${SimpleDateFormat("yyyy-MM-dd").format(calendar.time)}, dayOfWeek ${calendar.get(Calendar.DAY_OF_WEEK)}")
+                //println("월요일 찾기 ${SimpleDateFormat("yyyy.MM.dd").format(calendar.time)}, dayOfWeek ${calendar.get(Calendar.DAY_OF_WEEK)}")
                 if (calendar.get(Calendar.DAY_OF_WEEK) == 2) {
                     //println("찾음")
                     startDate = calendar.time

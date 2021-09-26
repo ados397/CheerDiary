@@ -14,7 +14,8 @@
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/text_tab_info"
-            android:text="클럽정보"
+            android:fontFamily="@font/font"
+            android:text="정보"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:background="@drawable/btn_round"
@@ -25,8 +26,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
+            android:id="@+id/text_tab_member"
+            android:fontFamily="@font/font"
+            android:text="멤버"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
             android:id="@+id/text_tab_rank"
-            android:text="클럽순위"
+            android:fontFamily="@font/font"
+            android:text="순위"
             android:textColor="@color/black"
             android:textSize="12sp"
             android:paddingLeft="20dp"
@@ -37,7 +51,8 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/text_tab_management"
-            android:text="클럽관리"
+            android:fontFamily="@font/font"
+            android:text="관리"
             android:textColor="@color/black"
             android:textSize="12sp"
             android:paddingLeft="20dp"
@@ -46,10 +61,29 @@
             android:paddingBottom="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/text_tab_schedule"
+            android:fontFamily="@font/font"
+            android:text="스케줄"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewpager"
+        android:layout_below="@+id/layout_tab"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <FrameLayout
+        android:id="@+id/layout_fragment_fan_club"
         android:layout_below="@+id/layout_tab"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

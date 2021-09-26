@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="deploymentTargetDropDown">
-    <runningDeviceTargetsSelectedWithDialog>
+    <runningDeviceTargetSelectedWithDropDown>
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
@@ -11,6 +11,7 @@
           </Key>
         </deviceKey>
       </Target>
-    </runningDeviceTargetsSelectedWithDialog>
+    </runningDeviceTargetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2021-09-24T07:47:11.195618400Z" />
   </component>
 </project>

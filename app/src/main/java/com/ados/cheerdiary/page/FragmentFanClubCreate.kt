@@ -10,17 +10,21 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentTransaction
 import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentFanClubCreateBinding
+import com.ados.cheerdiary.dialog.QuestionDialog
 import com.ados.cheerdiary.dialog.SelectFanClubSymbolDialog
 import com.ados.cheerdiary.model.FanClubDTO
 import com.ados.cheerdiary.model.MemberDTO
+import com.ados.cheerdiary.model.QuestionDTO
 import com.ados.cheerdiary.model.UserDTO
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.question_dialog.*
 import kotlinx.android.synthetic.main.select_fan_club_symbol_dialog.*
 import java.util.*
 
@@ -47,7 +51,7 @@ class FragmentFanClubCreate : Fragment() {
 
     private lateinit var callback: OnBackPressedCallback
 
-    private var symbolImage: Int = R.drawable.reward_icon_01
+    private var symbolImage: String = "reward_icon_01"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,14 +94,12 @@ class FragmentFanClubCreate : Fragment() {
             dialog.show()
 
             dialog.setOnDismissListener {
-                if (dialog.selectedSymbol > 0) {
-
+                if (dialog.isOK && !dialog.selectedSymbol.isNullOrEmpty()) {
                     symbolImage = dialog.selectedSymbol
-                    Glide.with(binding.imgSymbol.context)
-                        .asBitmap()
-                        .load(symbolImage) ///feed in path of the image
-                        .fitCenter()
-                        .into(binding.imgSymbol)
+                    var imageID = requireContext().resources.getIdentifier(symbolImage, "drawable", requireContext().packageName)
+                    if (imageID != null) {
+                        binding.imgSymbol.setImageResource(imageID)
+                    }
                 }
             }
         }
@@ -119,14 +121,16 @@ class FragmentFanClubCreate : Fragment() {
                     val alphabets = ('a'..'z').toMutableList()
                     val docName = "${alphabets[Random().nextInt(alphabets.size)]}${System.currentTimeMillis()}"
                     val user = (activity as MainActivity?)?.getUser()
-                    var fanClubDTO = FanClubDTO(false, docName, name, binding.editDescription.text.toString(), symbolImage.toString(), 1, 0.0, user?.uid, user?.nickname, 10, Date())
+                    // 팬클럽 창설 시 회원이 1명이기 때문에 count 는 1로 설정
+                    var fanClubDTO = FanClubDTO(false, docName, name, binding.editDescription.text.toString(), "", symbolImage, 1, 0.0, user?.uid, user?.nickname, 1, 10, Date())
                     firestore?.collection("fanClub")?.document(docName)?.set(fanClubDTO)?.addOnCompleteListener {
                         user?.fanClubId = docName
                         firestore?.collection("user")?.document(user?.uid!!)?.set(user)?.addOnCompleteListener {
                             //Toast.makeText(activity, "팬클럽 창설 완료!", Toast.LENGTH_SHORT).show()
                             //moveFanClubMain()
+                            (activity as MainActivity?)?.setUser(user)
                         }
-                        val member = MemberDTO(false, user?.uid, user?.nickname, 0, MemberDTO.POSITION.MASTER, false)
+                        val member = MemberDTO(false, user?.uid, user?.nickname, user?.level, user?.aboutMe, 0, MemberDTO.POSITION.MASTER, Date(), Date(), false)
                         firestore?.collection("fanClub")?.document(docName)?.collection("member")?.document(user?.uid.toString())?.set(member)?.addOnCompleteListener {
                             Toast.makeText(activity, "팬클럽 창설 완료!", Toast.LENGTH_SHORT).show()
                             moveFanClubMain()
@@ -147,6 +151,14 @@ class FragmentFanClubCreate : Fragment() {
                     }*/
                 }
             }
+        }
+
+        binding.editName.doAfterTextChanged {
+            binding.textNameLen.text = "${binding.editName.text.length}/30"
+        }
+
+        binding.editDescription.doAfterTextChanged {
+            binding.textDescriptionLen.text = "${binding.editDescription.text.length}/30"
         }
     }
 

@@ -4,18 +4,21 @@ package com.ados.cheerdiary.dialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.MissionDialogBinding
 import com.ados.cheerdiary.model.DashboardMissionDTO
 import com.ados.cheerdiary.model.ScheduleDTO
+import java.text.SimpleDateFormat
 
 
-class MissionDialog(context: Context, private val isRange: Boolean = true) : Dialog(context), View.OnClickListener {
+class MissionDialog(context: Context) : Dialog(context), View.OnClickListener {
 
     lateinit var binding: MissionDialogBinding
 
@@ -37,6 +40,7 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
 
         binding.textTitle.text = dashboardMissionDTO?.scheduleDTO?.title
         binding.editPurpose.setText(dashboardMissionDTO?.scheduleDTO?.purpose)
+        binding.textRange.text = "${SimpleDateFormat("yyyy.MM.dd").format(dashboardMissionDTO?.scheduleDTO?.startDate)} ~ ${SimpleDateFormat("yyyy.MM.dd").format(dashboardMissionDTO?.scheduleDTO?.endDate)}"
 
         missionCount = dashboardMissionDTO?.scheduleProgressDTO?.count!!
         missionCountMax = dashboardMissionDTO?.scheduleDTO?.count!!
@@ -44,6 +48,46 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
         binding.textRate.text = "${missionCount}/${missionCountMax}"
         getPercent()
 
+        when (dashboardMissionDTO?.scheduleDTO?.action) { // 앱 실행
+            ScheduleDTO.ACTION.APP -> {
+                binding.textExecute.text = "앱 실행"
+                binding.imgIcon.setImageResource(R.drawable.app)
+                binding.textAppName.visibility = View.VISIBLE
+                binding.textAppName.text = "[${dashboardMissionDTO?.scheduleDTO?.appDTO?.appName}]"
+            }
+            ScheduleDTO.ACTION.URL -> {
+                binding.textExecute.text = "링크 실행"
+                binding.imgIcon.setImageResource(R.drawable.link)
+                binding.textAppName.visibility = View.GONE
+            }
+        }
+
+        binding.buttonMinus100.setOnClickListener {
+            if (missionCount > 0) {
+                if (missionCount - 100 < 0) {
+                    missionCount = 0
+                } else {
+                    missionCount = missionCount.minus(100)
+                }
+                println("미션 카운트 $missionCount")
+                binding.textRate.text = "${missionCount}/${missionCountMax}"
+
+                getPercent()
+            }
+        }
+        binding.buttonMinus10.setOnClickListener {
+            if (missionCount > 0) {
+                if (missionCount - 10 < 0) {
+                    missionCount = 0
+                } else {
+                    missionCount = missionCount.minus(10)
+                }
+                println("미션 카운트 $missionCount")
+                binding.textRate.text = "${missionCount}/${missionCountMax}"
+
+                getPercent()
+            }
+        }
         binding.buttonMinus.setOnClickListener {
             if (missionCount > 0) {
                 missionCount--
@@ -60,6 +104,32 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
                 getPercent()
             }
         }
+        binding.buttonPlus10.setOnClickListener {
+            if (missionCount < missionCountMax) {
+                if (missionCount + 10 > missionCountMax) {
+                    missionCount = missionCountMax
+                } else {
+                    missionCount = missionCount.plus(10)
+                }
+                println("미션 카운트 $missionCount")
+                binding.textRate.text = "${missionCount}/${missionCountMax}"
+
+                getPercent()
+            }
+        }
+        binding.buttonPlus100.setOnClickListener {
+            if (missionCount < missionCountMax) {
+                if (missionCount + 100 > missionCountMax) {
+                    missionCount = missionCountMax
+                } else {
+                    missionCount = missionCount.plus(100)
+                }
+                println("미션 카운트 $missionCount")
+                binding.textRate.text = "${missionCount}/${missionCountMax}"
+
+                getPercent()
+            }
+        }
         binding.buttonMax.setOnClickListener {
             missionCount = missionCountMax
             binding.textRate.text = "${missionCount}/${missionCountMax}"
@@ -67,7 +137,7 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
             getPercent()
         }
 
-        binding.buttonExecuteApp.setOnClickListener {
+        binding.buttonExecute.setOnClickListener {
             when (dashboardMissionDTO?.scheduleDTO?.action) { // 앱 실행
                 ScheduleDTO.ACTION.APP -> {
                     val linePackage = dashboardMissionDTO?.scheduleDTO?.appDTO?.packageName.toString()
@@ -89,6 +159,10 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
         }
 
 
+        binding.editPurpose.setOnTouchListener { view, motionEvent ->
+            //binding.scrollView.requestDisallowInterceptTouchEvent(true)
+            false
+        }
     }
 
     private fun getPercent() {
@@ -96,30 +170,30 @@ class MissionDialog(context: Context, private val isRange: Boolean = true) : Dia
         binding.progressPercent.progress = missionPercent
 
         binding.textPercent.text = "${missionPercent}%"
-    }
 
-    fun setButtonOk(name: String) {
-        //binding.buttonOk.text = name
-    }
-
-    fun setButtonCancel(name: String) {
-        binding.buttonCancel.text = name
-    }
-
-    fun showButtonOk(visible: Boolean) {
-        if (visible == true) {
-            binding.buttonOk.visibility = View.VISIBLE
+        if (missionPercent < 100) {
+            binding.imgComplete.visibility = View.GONE
+            when {
+                missionPercent < 40 -> {
+                    setPercent(ContextCompat.getColor(context!!, R.color.progress_0))
+                }
+                missionPercent < 70 -> {
+                    setPercent(ContextCompat.getColor(context!!, R.color.progress_40))
+                }
+                else -> {
+                    setPercent(ContextCompat.getColor(context!!, R.color.progress_70))
+                }
+            }
         } else {
-            binding.buttonOk.visibility = View.GONE
+            binding.imgComplete.visibility = View.VISIBLE
+            setPercent(ContextCompat.getColor(context!!, R.color.progress_100))
         }
     }
 
-    fun showButtonCancel(visible: Boolean) {
-        if (visible == true) {
-            binding.buttonCancel.visibility = View.VISIBLE
-        } else {
-            binding.buttonCancel.visibility = View.GONE
-        }
+    fun setPercent(color: Int) {
+        binding.textPercent.setTextColor(color)
+        binding.progressPercent.progressDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
     }
 
     private fun init() {

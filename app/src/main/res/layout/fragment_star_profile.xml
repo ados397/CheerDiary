@@ -32,6 +32,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:fontFamily="@font/font"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

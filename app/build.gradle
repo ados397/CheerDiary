@@ -11,11 +11,10 @@ android {
 
     defaultConfig {
         applicationId "com.ados.cheerdiary"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,4 +59,6 @@ dependencies {
     implementation 'com.nex3z:toggle-button-group:1.2.3'
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5"
 }

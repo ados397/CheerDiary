@@ -21,9 +21,8 @@ class SelectFanClubSymbolDialog(context: Context) : Dialog(context), OnFanClubSy
 
     private val layout = R.layout.select_fan_club_symbol_dialog
     var recyclerViewAdapter: RecyclerViewAdapterFanClubSymbol? = null
-    var selectedSymbol: Int = 0
-
-    private var symbols : ArrayList<Int> = arrayListOf()
+    var selectedSymbol: String = "reward_icon_01"
+    var isOK: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,12 +45,19 @@ class SelectFanClubSymbolDialog(context: Context) : Dialog(context), OnFanClubSy
 
         recyclerViewAdapter = RecyclerViewAdapterFanClubSymbol(symbols, this)
         binding.rvAppList.adapter = recyclerViewAdapter
+
+        binding.buttonSymbolCancel.setOnClickListener {
+            isOK = false
+            dismiss()
+        }
     }
 
     override fun onItemClick(item: Int, position: Int) {
         //recyclerViewAdapter?.selectItem(position)
         //selectedApp = item
-        selectedSymbol = item
+        //selectedSymbol = item
+        selectedSymbol = "reward_icon_${String.format("%02d",position+1)}"
+        isOK = true
         dismiss()
     }
 }

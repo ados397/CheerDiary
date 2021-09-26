@@ -5,8 +5,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
+import android.widget.EditText
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.size
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -14,6 +17,8 @@ import androidx.fragment.app.FragmentTransaction
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentScheduleAddBinding
 import com.ados.cheerdiary.dialog.SelectAppDialog
+import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
 import com.ados.cheerdiary.model.ScheduleDTO
 import com.applikeysolutions.cosmocalendar.selection.OnDaySelectedListener
 import com.applikeysolutions.cosmocalendar.selection.RangeSelectionManager
@@ -37,9 +42,6 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentScheduleAdd : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
     private var _binding: FragmentScheduleAddBinding? = null
     private val binding get() = _binding!!
 
@@ -47,6 +49,9 @@ class FragmentScheduleAdd : Fragment() {
 
     private var firebaseAuth : FirebaseAuth? = null
     private var firestore : FirebaseFirestore? = null
+
+    private var fanClubDTO: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
 
     var scheduleDTO = ScheduleDTO()
     private var titleOK: Boolean = false
@@ -59,8 +64,8 @@ class FragmentScheduleAdd : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fanClubDTO = it.getParcelable(ARG_PARAM1)
+            currentMember = it.getParcelable(ARG_PARAM2)
         }
     }
 
@@ -108,8 +113,10 @@ class FragmentScheduleAdd : Fragment() {
             countOK = true
 
             binding.editTitle.setText(scheduleDTO.title)
+            binding.textTitleLen.text = "${binding.editTitle.text.length}/30"
             setStartEndDate()
             binding.editPurpose.setText(scheduleDTO.purpose)
+            binding.textPurposeLen.text = "${binding.editPurpose.text.length}/300"
             when (scheduleDTO.action) {
                 ScheduleDTO.ACTION.APP -> {
                     binding.textSelectedApp.text = scheduleDTO.appDTO?.appName
@@ -150,13 +157,14 @@ class FragmentScheduleAdd : Fragment() {
                 binding.switchAlarm.isChecked = true
             }
 
-            if (scheduleDTO.isFanClub == true) {
-                binding.switchShare.isChecked = true
-            }
-
             visibleOkButton()
         } else {
             getAlarmDateText(binding.timepickerAlarm.currentHour, binding.timepickerAlarm.currentMinute)
+        }
+
+        binding.editPurpose.setOnTouchListener { view, motionEvent ->
+            binding.scrollView.requestDisallowInterceptTouchEvent(true)
+            false
         }
 
         binding.buttonBack.setOnClickListener {
@@ -169,11 +177,11 @@ class FragmentScheduleAdd : Fragment() {
             dialog.setCanceledOnTouchOutside(false)
             dialog.show()
 
-            dialog.button_cancel.setOnClickListener { // No
+            dialog.button_app_cancel.setOnClickListener { // No
                 dialog.dismiss()
             }
 
-            dialog.button_ok.setOnClickListener { // Ok
+            dialog.button_app_ok.setOnClickListener { // Ok
                 if (dialog.selectedApp == null) {
                     Toast.makeText(activity,"선택된 앱이 없습니다.", Toast.LENGTH_SHORT).show()
                 } else {
@@ -211,14 +219,6 @@ class FragmentScheduleAdd : Fragment() {
             } else {
                 binding.layoutAlarm.visibility = View.GONE
                 scheduleDTO.isAlarm = false
-            }
-        }
-
-        binding.switchShare.setOnCheckedChangeListener { compoundButton, b ->
-            if (b) {
-                scheduleDTO.isFanClub = true
-            } else {
-                scheduleDTO.isFanClub = false
             }
         }
 
@@ -340,9 +340,10 @@ class FragmentScheduleAdd : Fragment() {
             scheduleDTO.alarmDTO.alarmMinute = binding.timepickerAlarm.currentMinute
 
             //firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.document()?.set(scheduleDTO)?.addOnCompleteListener {
-            firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.document(scheduleDTO.docName.toString())?.set(scheduleDTO)?.addOnCompleteListener {
-                Toast.makeText(activity,"스케줄 저장 완료", Toast.LENGTH_SHORT).show()
-                finishFragment()
+            if (fanClubDTO == null) {
+                setPersonalSchedule()
+            } else {
+                setFanClubSchedule()
             }
         }
 
@@ -360,6 +361,20 @@ class FragmentScheduleAdd : Fragment() {
             }
 
         }*/
+    }
+
+    private fun setPersonalSchedule() {
+        firestore?.collection("user")?.document(firebaseAuth?.currentUser?.uid.toString())?.collection("schedule")?.document(scheduleDTO.docName.toString())?.set(scheduleDTO)?.addOnCompleteListener {
+            Toast.makeText(activity,"스케줄 저장 완료", Toast.LENGTH_SHORT).show()
+            finishFragment()
+        }
+    }
+
+    private fun setFanClubSchedule() {
+        firestore?.collection("fanClub")?.document(fanClubDTO?.docName.toString())?.collection("schedule")?.document(scheduleDTO.docName.toString())?.set(scheduleDTO)?.addOnCompleteListener {
+            Toast.makeText(activity,"팬클럽 스케줄 저장 완료", Toast.LENGTH_SHORT).show()
+            finishFragment()
+        }
     }
 
     private fun selectActionApp() {
@@ -392,11 +407,25 @@ class FragmentScheduleAdd : Fragment() {
     }
 
     private fun callBackPressed() {
-        finishFragment()
+        if (fanClubDTO == null) {
+            finishFragment()
+        } else {
+            finishFragment()
+        }
     }
 
     private fun finishFragment() {
-        val fragment = FragmentScheduleList()
+        val fragment = FragmentScheduleList.newInstance(fanClubDTO, currentMember)
+        parentFragmentManager.beginTransaction().apply{
+            replace(R.id.layout_fragment, fragment)
+            setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+            addToBackStack(null)
+            commit()
+        }
+    }
+
+    private fun finishFragmentFanClub() {
+        val fragment = FragmentFanClubSchedule()
         parentFragmentManager.beginTransaction().apply{
             replace(R.id.layout_fragment, fragment)
             setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
@@ -548,8 +577,8 @@ class FragmentScheduleAdd : Fragment() {
     }
 
     private fun setStartEndDate() {
-        var startDate = SimpleDateFormat("yyyy-MM-dd").format(scheduleDTO.startDate)
-        var endDate = SimpleDateFormat("yyyy-MM-dd").format(scheduleDTO.endDate)
+        var startDate = SimpleDateFormat("yyyy.MM.dd").format(scheduleDTO.startDate)
+        var endDate = SimpleDateFormat("yyyy.MM.dd").format(scheduleDTO.endDate)
 
         println("스타트 ${scheduleDTO.startDate}, 엔드 ${scheduleDTO.endDate}")
 
@@ -670,11 +699,11 @@ class FragmentScheduleAdd : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: FanClubDTO?, param2: MemberDTO?) =
             FragmentScheduleAdd().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putParcelable(ARG_PARAM1, param1)
+                    putParcelable(ARG_PARAM2, param2)
                 }
             }
     }

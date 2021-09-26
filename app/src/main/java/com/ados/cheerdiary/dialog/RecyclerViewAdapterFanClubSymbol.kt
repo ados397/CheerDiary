@@ -25,19 +25,19 @@ class RecyclerViewAdapterFanClubSymbol(private val items: ArrayList<Int>, var cl
 
         items[position].let { item ->
             with(holder) {
-                appName.text = "$position"
+                appName.text = "${position+1}"
 
                 //Glide.with(holder.itemView.context).load(item.iconImage).apply(
                     //RequestOptions().centerCrop()).into(iconImage)
 
                 //var imageID = itemView.context.resources.getIdentifier(item.iconImage, "drawable", itemView.context.packageName)
-                if (iconImage != null && item > 0) {
-                    //iconImage?.setImageResource(item)
-                    Glide.with(iconImage.context)
+                if (imgSymbol != null && item > 0) {
+                    imgSymbol?.setImageResource(item)
+                    /*Glide.with(iconImage.context)
                         .asBitmap()
                         .load(item) ///feed in path of the image
                         .fitCenter()
-                        .into(holder.iconImage)
+                        .into(holder.iconImage)*/
                 }
 
                 /*if (item.isSelected) {
@@ -67,7 +67,7 @@ class RecyclerViewAdapterFanClubSymbol(private val items: ArrayList<Int>, var cl
 
     inner class ViewHolder(private val viewBinding: ListItemFanClubSymbolBinding) : RecyclerView.ViewHolder(viewBinding.root) {
         var mainLayout = viewBinding.layoutFanClubSymbol
-        var iconImage = viewBinding.imgIcon
+        var imgSymbol = viewBinding.imgSymbol
         val appName = viewBinding.textAppName
 
         fun initalize(item: Int, action:OnFanClubSymbolClickListener) {

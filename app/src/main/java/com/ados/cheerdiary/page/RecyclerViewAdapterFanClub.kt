@@ -24,7 +24,7 @@ class RecyclerViewAdapterFanClub(private val items: ArrayList<FanClubDTO>, var c
 
         items[position].let { item ->
             with(holder) {
-                var imageID = itemView.context.resources.getIdentifier(item.iconImage, "drawable", itemView.context.packageName)
+                var imageID = itemView.context.resources.getIdentifier(item.imgSymbol, "drawable", itemView.context.packageName)
                 if (image != null && imageID > 0) {
                     //iconImage?.setImageResource(item)
                     Glide.with(image.context)
@@ -37,7 +37,7 @@ class RecyclerViewAdapterFanClub(private val items: ArrayList<FanClubDTO>, var c
                 name.text = "${item.name}"
                 level.text = "Lv. ${item.level}"
                 master.text = "${item.masterNickname}"
-                count.text = "${item.count}/30"
+                count.text = "${item.count}/${item.countMax}"
 
                 if (item.isSelected) {
                     mainLayout.setBackgroundColor(Color.parseColor("#BBD5F8"))
@@ -65,7 +65,7 @@ class RecyclerViewAdapterFanClub(private val items: ArrayList<FanClubDTO>, var c
     }
 
     inner class ViewHolder(private val viewBinding: ListItemFanClubBinding) : RecyclerView.ViewHolder(viewBinding.root) {
-        var image = viewBinding.imgIcon
+        var image = viewBinding.imgSymbol
         var name = viewBinding.textName
         var level = viewBinding.textLevel
         var master = viewBinding.textMaster

@@ -1,30 +1,40 @@
 package com.ados.cheerdiary.model
 
+import android.os.Parcelable
 import com.ados.cheerdiary.R
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
+@Parcelize
 data class FanClubDTO(
     var isSelected: Boolean = false,
     val docName: String? = null,
     val name: String? = null,
-    val description: String? = null,
-    val iconImage: String? = null,
+    var description: String? = null,
+    var notice: String? = null,
+    var imgSymbol: String? = null,
     val level: Int? = 0,
     val exp: Double? = 0.0,
     val masterUid: String? = null,
-    val masterNickname: String? = null,
-    val count: Int? = 0,
+    var masterNickname: String? = null,
+    var count: Int? = 0,
+    val countMax: Int? = 0,
     val createTime: Date? = null
-) {}
+) : Parcelable {}
 
+@Parcelize
 data class MemberDTO(
     var isSelected: Boolean = false,
     val userUid: String? = null,
-    val userNickname: String? = null,
+    var userNickname: String? = null,
+    val userLevel: Int? = 0,
+    var userAboutMe: String? = null,
     val contribution: Int? = 0,
-    val position: POSITION? = POSITION.MEMBER,
+    var position: POSITION? = POSITION.MEMBER,
+    var requestTime: Date? = null,
+    var responseTime: Date? = null,
     val isCheckout: Boolean? = false
-) {
+) : Parcelable {
     enum class POSITION {
         MASTER, SUB_MASTER, MEMBER, GUEST
     }

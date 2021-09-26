@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentPageFanClubBinding
+import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,17 +23,17 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentPageFanClub : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
     private var _binding: FragmentPageFanClubBinding? = null
     private val binding get() = _binding!!
+
+    private var fanClubDTO: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fanClubDTO = it.getParcelable(ARG_PARAM1)
+            currentMember = it.getParcelable(ARG_PARAM2)
         }
     }
 
@@ -48,7 +50,7 @@ class FragmentPageFanClub : Fragment() {
             val fragment = FragmentFanClubInitalize()
             childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
         } else { // 가입된 팬클럽이 있으면 팬클럽 정보 페이지로
-            val fragment = FragmentFanClubMain()
+            val fragment = FragmentFanClubMain.newInstance(fanClubDTO, currentMember)
             childFragmentManager.beginTransaction().replace(R.id.layout_fragment, fragment).commit()
         }
 
@@ -77,11 +79,11 @@ class FragmentPageFanClub : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: FanClubDTO?, param2: MemberDTO?) =
             FragmentPageFanClub().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putParcelable(ARG_PARAM1, param1)
+                    putParcelable(ARG_PARAM2, param2)
                 }
             }
     }

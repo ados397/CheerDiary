@@ -3,29 +3,42 @@ package com.ados.cheerdiary
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Window
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import com.ados.cheerdiary.databinding.ActivityMainBinding
+import com.ados.cheerdiary.dialog.DisplayBoardDialog
+import com.ados.cheerdiary.dialog.MissionDialog
 import com.ados.cheerdiary.dialog.QuestionDialog
-import com.ados.cheerdiary.model.QuestionDTO
-import com.ados.cheerdiary.model.UserDTO
+import com.ados.cheerdiary.model.*
 import com.ados.cheerdiary.page.ZoomOutPageTransformer
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.display_board_dialog.*
+import kotlinx.android.synthetic.main.mission_dialog.*
 import kotlinx.android.synthetic.main.question_dialog.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.concurrent.timer
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val tabIcon = listOf(
-        R.drawable.schedule,
+        R.drawable.dashboard,
         R.drawable.fan_club,
         R.drawable.schedule,
-        R.drawable.schedule,
+        R.drawable.user,
     )
 
-    private val tabLayoutText = arrayOf("상황판", "스케줄", "계정설정", "더보기")
+    private var firestore : FirebaseFirestore? = null
 
     private var currentUser: UserDTO? = null
+    private var currentFanClub: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,19 +58,111 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
             dialog.showButtonOk(false)
             dialog.setButtonCancel("확인")
-            dialog.button_cancel.setOnClickListener { // No
+            dialog.button_question_cancel.setOnClickListener { // No
                 dialog.dismiss()
                 appExit()
             }
         }
 
+        val anim = AlphaAnimation(0.1f, 1.0f)
+        anim.duration = 800
+        anim.startOffset = 20
+        anim.repeatMode = Animation.REVERSE
+        anim.repeatCount = Animation.INFINITE
+        binding.displayBoard.textDisplayBoard.startAnimation(anim)
+        binding.displayBoard.textDisplayBoard.requestFocus()
+        binding.displayBoard.textDisplayBoard.setOnFocusChangeListener { view, b ->
+            if (!b) {
+                binding.displayBoard.textDisplayBoard.requestFocus()
+            }
+        }
+
+        firestore = FirebaseFirestore.getInstance()
+
+        if (currentUser?.fanClubId == null) {
+            setViewPager()
+        } else {
+            firestore?.collection("fanClub")?.document(currentUser?.fanClubId.toString())?.get()
+                ?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        if (task.result.exists()) { // document 있음
+                            currentFanClub = task.result.toObject(FanClubDTO::class.java)!!
+                            firestore?.collection("fanClub")
+                                ?.document(currentUser?.fanClubId.toString())?.collection("member")
+                                ?.document(currentUser?.uid.toString())?.get()
+                                ?.addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        if (task.result.exists()) { // document 있음
+                                            currentMember = task.result.toObject(MemberDTO::class.java)!!
+                                        }
+                                    }
+                                    setViewPager()
+                                }
+                        } else {
+                            // 팬클럽 정보 가져오기 실패
+                        }
+
+
+                    }
+                }
+        }
+
+        firestore?.collection("displayBoard")?.orderBy("order", Query.Direction.DESCENDING)?.limit(1)?.addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+            if(querySnapshot == null)return@addSnapshotListener
+            for(snapshot in querySnapshot){
+                var displayBoardDTO = snapshot.toObject(DisplayBoardDTO::class.java)!!
+                binding.displayBoard.textDisplayBoard.text = displayBoardDTO.displayText
+                binding.displayBoard.textDisplayBoard.setTextColor(displayBoardDTO.color!!)
+            }
+        }
+
+        binding.displayBoard.layoutMain.setOnClickListener {
+            val dialog = DisplayBoardDialog(this)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.currentUser = currentUser
+            dialog.show()
+
+            dialog.button_display_board_ok.setOnClickListener { // Ok
+                dialog.dismiss()
+            }
+        }
+    }
+
+    fun refreshFanClubDTO(myCallback: (FanClubDTO) -> Unit) {
+        firestore?.collection("fanClub")?.document(currentUser?.fanClubId.toString())?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful && task.result.exists()) {
+                currentFanClub = task.result.toObject(FanClubDTO::class.java)!!
+                myCallback(currentFanClub!!)
+            }
+        }
+    }
+
+    fun refreshMemberDTO(myCallback: (MemberDTO) -> Unit) {
+        firestore?.collection("fanClub")?.document(currentUser?.fanClubId.toString())
+            ?.collection("member")?.document(currentUser?.uid.toString())?.get()?.addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result.exists()) {
+                    currentMember = task.result.toObject(MemberDTO::class.java)!!
+                    myCallback(currentMember!!)
+                }
+            }
+    }
+
+    private fun setViewPager() {
         binding.viewpager.isUserInputEnabled = false // 좌우 터치 스와이프 금지
         binding.viewpager.apply {
-            adapter = MyPagerAdapter(context as FragmentActivity)
+            adapter = MyPagerAdapter(
+                context as FragmentActivity,
+                currentFanClub,
+                currentMember
+            )
             setPageTransformer(ZoomOutPageTransformer())
         }
 
-        TabLayoutMediator(binding.tabs, binding.viewpager) { tab, position ->
+        TabLayoutMediator(
+            binding.tabs,
+            binding.viewpager
+        ) { tab, position ->
             //tab.text = "${tabLayoutText[position]}"
             tab.setIcon(tabIcon[position])
         }.attach()
@@ -70,6 +175,18 @@ class MainActivity : AppCompatActivity() {
 
     fun getUser() : UserDTO {
         return currentUser!!
+    }
+
+    fun setUser(user: UserDTO) {
+        currentUser = user
+    }
+
+    fun setFanClub(fanClub: FanClubDTO) {
+        currentFanClub = fanClub
+    }
+
+    fun setMember(member: MemberDTO) {
+        currentMember = member
     }
 
     private fun appExit() {

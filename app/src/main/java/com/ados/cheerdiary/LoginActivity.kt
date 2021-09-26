@@ -3,6 +3,8 @@ package com.ados.cheerdiary
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,8 +22,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-
-
+import java.util.*
 
 
 class LoginActivity : AppCompatActivity() {
@@ -69,36 +70,15 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, JoinActivity::class.java))
         }
 
-        binding.buttonLogin.setOnClickListener {
-            when {
-                binding.editEmail.text.isNullOrEmpty() -> {
-                    Toast.makeText(this, "이메일을 입력하세요.", Toast.LENGTH_SHORT).show()
-                }
-                binding.editPassword.text.isNullOrEmpty() -> {
-                    Toast.makeText(this, "비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
-                }
-                else -> {
-                    firebaseAuth?.signInWithEmailAndPassword(binding.editEmail.text.toString(), binding.editPassword.text.toString())?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            firestore?.collection("user")?.document(firebaseAuth?.uid!!)?.get()?.addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    println("조회 성공? $task")
-                                    if (task.result.exists()) { // document 있음
-                                        var user = task.result.toObject(UserDTO::class.java)!!
-                                        callMainActivity(user)
-                                        Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
-                                    } else { // document 없으면 회원 가입 페이지로 이동
-                                        Toast.makeText(this, "로그인에 실패하였습니다. 관리자에게 문의 하세요.", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        } else if (!task.exception?.message.isNullOrEmpty()) {
-                            //Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                            Toast.makeText(this, "로그인에 실패하였습니다. 이메일과 비밀번호를 확인해보세요.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
+        binding.editPassword.setOnKeyListener { view, i, keyEvent ->
+            if (keyEvent.action == KeyEvent.ACTION_DOWN && i == KEYCODE_ENTER) {
+                login()
             }
+            false
+        }
+
+        binding.buttonLogin.setOnClickListener {
+            login()
         }
 
         binding.buttonLoginGoogle.setOnClickListener {
@@ -132,6 +112,39 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
+    private fun login() {
+        val email = binding.editEmail.text.toString().trim()
+        when {
+            email.isNullOrEmpty() -> {
+                Toast.makeText(this, "이메일을 입력하세요.", Toast.LENGTH_SHORT).show()
+            }
+            binding.editPassword.text.isNullOrEmpty() -> {
+                Toast.makeText(this, "비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                firebaseAuth?.signInWithEmailAndPassword(email, binding.editPassword.text.toString())?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        firestore?.collection("user")?.document(firebaseAuth?.uid!!)?.get()?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                println("조회 성공? $task")
+                                if (task.result.exists()) { // document 있음
+                                    var user = task.result.toObject(UserDTO::class.java)!!
+                                    callMainActivity(user)
+                                    Toast.makeText(this, "로그인 성공", Toast.LENGTH_SHORT).show()
+                                } else { // document 없으면 회원 가입 페이지로 이동
+                                    Toast.makeText(this, "로그인에 실패하였습니다. 관리자에게 문의 하세요.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    } else if (!task.exception?.message.isNullOrEmpty()) {
+                        //Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "로그인에 실패하였습니다. 이메일과 비밀번호를 확인해보세요.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager?.onActivityResult(requestCode, resultCode, data)
@@ -160,7 +173,7 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(this, "구글 로그인 성공", Toast.LENGTH_SHORT).show()
-                        loginOrJoin(UserDTO(firebaseAuth?.currentUser?.uid, firebaseAuth?.currentUser?.email, UserDTO.LoginType.GOOGLE, null, null))
+                        loginOrJoin(UserDTO(firebaseAuth?.currentUser?.uid, firebaseAuth?.currentUser?.email, UserDTO.LoginType.GOOGLE, null, 1, 0.0, null, null, "", "", Date()))
                     } else if (!task.exception?.message.isNullOrEmpty()) {
                         //Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                         //Toast.makeText(this, "구글 로그인에 실패하였습니다. 이메일과 비밀번호를 확인해보세요.", Toast.LENGTH_SHORT).show()
@@ -176,7 +189,7 @@ class LoginActivity : AppCompatActivity() {
         firebaseAuth?.signInWithCredential(credential)?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(this, "페이스북 로그인 성공", Toast.LENGTH_SHORT).show()
-                loginOrJoin(UserDTO(firebaseAuth?.currentUser?.uid, firebaseAuth?.currentUser?.email, UserDTO.LoginType.FACEBOOK, null, null))
+                loginOrJoin(UserDTO(firebaseAuth?.currentUser?.uid, firebaseAuth?.currentUser?.email, UserDTO.LoginType.FACEBOOK, null, 1, 0.0, null, null, "", "", Date()))
             } else if (!task.exception?.message.isNullOrEmpty()) {
                 //Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, "페이스북 로그인에 실패하였습니다. 동일한 이메일을 사용하는 사용자가 이미 존재할 수 있습니다.", Toast.LENGTH_SHORT).show()

@@ -10,9 +10,14 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.MyPagerAdapterFanClub
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentFanClubMainBinding
+import com.ados.cheerdiary.model.FanClubDTO
+import com.ados.cheerdiary.model.MemberDTO
+import com.ados.cheerdiary.model.UserDTO
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,17 +31,19 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentFanClubMain : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
     private var _binding: FragmentFanClubMainBinding? = null
     private val binding get() = _binding!!
+
+    private var firestore : FirebaseFirestore? = null
+
+    private var fanClubDTO: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fanClubDTO = it.getParcelable(ARG_PARAM1)
+            currentMember = it.getParcelable(ARG_PARAM2)
         }
     }
 
@@ -48,29 +55,73 @@ class FragmentFanClubMain : Fragment() {
         _binding = FragmentFanClubMainBinding.inflate(inflater, container, false)
         var rootView = binding.root.rootView
 
+        firestore = FirebaseFirestore.getInstance()
+
+        setFanClubInfo()
+
         binding.viewpager.isUserInputEnabled = false // 좌우 터치 스와이프 금지
         binding.viewpager.apply {
-            adapter = MyPagerAdapterFanClub(context as FragmentActivity)
+            //adapter = MyPagerAdapterFanClub(context as FragmentActivity, fanClubDTO!!, currentMember!!)
+            adapter = MyPagerAdapterFanClub(childFragmentManager, viewLifecycleOwner.lifecycle, fanClubDTO!!, currentMember!!)
             setPageTransformer(ZoomOutPageTransformer())
         }
+        /*val user = (activity as MainActivity?)?.getUser()
+        firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (task.result.exists()) { // document 있음
+                    fanClubDTO = task.result.toObject(FanClubDTO::class.java)!!
+                    firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.collection("member")?.document(user?.uid!!)?.get()?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            if (task.result.exists()) { // document 있음
+                                currentMember = task.result.toObject(MemberDTO::class.java)!!
+
+                                when {
+                                    isAdministrator() -> { // 클럽장, 부클럽장 메뉴 활성화
+                                        binding.textTabSchedule.visibility = View.VISIBLE
+                                    }
+                                    else -> {
+                                        binding.textTabSchedule.visibility = View.GONE
+                                    }
+                                }
+                                binding.viewpager.isUserInputEnabled = false // 좌우 터치 스와이프 금지
+                                binding.viewpager.apply {
+                                    //adapter = MyPagerAdapterFanClub(context as FragmentActivity, fanClubDTO!!, currentMember!!)
+                                    adapter = MyPagerAdapterFanClub(childFragmentManager, viewLifecycleOwner.lifecycle, fanClubDTO!!, currentMember!!)
+                                    setPageTransformer(ZoomOutPageTransformer())
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // 팬클럽 정보 가져오기 실패
+                }
+            }
+        }*/
 
         binding.textTabInfo.setOnClickListener {
             binding.viewpager.currentItem = 0
+            releaseAllTabButton()
             setTabButton(binding.textTabInfo)
-            releaseTabButton(binding.textTabRank)
-            releaseTabButton(binding.textTabManagement)
+        }
+        binding.textTabMember.setOnClickListener {
+            binding.viewpager.currentItem = 1
+            releaseAllTabButton()
+            setTabButton(binding.textTabMember)
         }
         binding.textTabRank.setOnClickListener {
-            binding.viewpager.currentItem = 1
+            binding.viewpager.currentItem = 2
+            releaseAllTabButton()
             setTabButton(binding.textTabRank)
-            releaseTabButton(binding.textTabInfo)
-            releaseTabButton(binding.textTabManagement)
         }
         binding.textTabManagement.setOnClickListener {
-            binding.viewpager.currentItem = 2
+            binding.viewpager.currentItem = 3
+            releaseAllTabButton()
             setTabButton(binding.textTabManagement)
-            releaseTabButton(binding.textTabInfo)
-            releaseTabButton(binding.textTabRank)
+        }
+        binding.textTabSchedule.setOnClickListener {
+            binding.viewpager.currentItem = 4
+            releaseAllTabButton()
+            setTabButton(binding.textTabSchedule)
         }
 
         return rootView
@@ -86,6 +137,25 @@ class FragmentFanClubMain : Fragment() {
 
     }
 
+    fun setFanClubInfo() {
+        when {
+            isAdministrator() -> { // 클럽장, 부클럽장 메뉴 활성화
+                binding.textTabSchedule.visibility = View.VISIBLE
+            }
+            else -> {
+                binding.textTabSchedule.visibility = View.GONE
+            }
+        }
+    }
+
+    fun setFanClub(fanClub: FanClubDTO) {
+        fanClubDTO = fanClub
+    }
+
+    fun setMember(member: MemberDTO) {
+        currentMember = member
+    }
+
     private fun setTabButton(textView: TextView) {
         textView.background = AppCompatResources.getDrawable(requireContext(), R.drawable.btn_round)
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
@@ -94,6 +164,22 @@ class FragmentFanClubMain : Fragment() {
     private fun releaseTabButton(textView: TextView) {
         textView.background = null
         textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+    }
+
+    private fun releaseAllTabButton() {
+        releaseTabButton(binding.textTabInfo)
+        releaseTabButton(binding.textTabMember)
+        releaseTabButton(binding.textTabRank)
+        releaseTabButton(binding.textTabManagement)
+        releaseTabButton(binding.textTabSchedule)
+    }
+
+    private fun isMaster() : Boolean {
+        return currentMember?.position == MemberDTO.POSITION.MASTER
+    }
+
+    private fun isAdministrator() : Boolean {
+        return currentMember?.position == MemberDTO.POSITION.MASTER || currentMember?.position == MemberDTO.POSITION.SUB_MASTER
     }
 
     companion object {
@@ -107,11 +193,11 @@ class FragmentFanClubMain : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: FanClubDTO?, param2: MemberDTO?) =
             FragmentFanClubMain().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putParcelable(ARG_PARAM1, param1)
+                    putParcelable(ARG_PARAM2, param2)
                 }
             }
     }

@@ -3,9 +3,14 @@ package com.ados.cheerdiary.model
 import java.util.*
 
 data class DashboardMissionDTO(
+    var type: TYPE = TYPE.PERSONAL,
     var scheduleDTO: ScheduleDTO? = null,
     var scheduleProgressDTO: ScheduleProgressDTO? = null
-) {}
+) {
+    enum class TYPE {
+        PERSONAL, FAN_CLUB
+    }
+}
 
 data class ScheduleDTO(
     var isSelected: Boolean = false,
@@ -21,8 +26,7 @@ data class ScheduleDTO(
     var cycle: CYCLE? = CYCLE.DAY,
     var count: Long? = 0L,
     var isAlarm: Boolean? = false,
-    var alarmDTO: AlarmDTO = AlarmDTO(),
-    var isFanClub: Boolean? = false
+    var alarmDTO: AlarmDTO = AlarmDTO()
 ) {
     enum class ACTION {
         APP, URL

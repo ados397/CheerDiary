@@ -1,21 +1,38 @@
 package com.ados.cheerdiary.page
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ados.cheerdiary.MainActivity
 import com.ados.cheerdiary.R
 import com.ados.cheerdiary.databinding.FragmentFanClubInfoBinding
+import com.ados.cheerdiary.dialog.EditTextModifyDialog
+import com.ados.cheerdiary.dialog.QuestionDialog
+import com.ados.cheerdiary.dialog.SelectFanClubSymbolDialog
+import com.ados.cheerdiary.model.EditTextDTO
 import com.ados.cheerdiary.model.FanClubDTO
 import com.ados.cheerdiary.model.MemberDTO
-import com.ados.cheerdiary.model.UserDTO
+import com.ados.cheerdiary.model.QuestionDTO
+import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.edit_text_modify_dialog.*
+import kotlinx.android.synthetic.main.question_dialog.*
+import kotlinx.android.synthetic.main.select_fan_club_symbol_dialog.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -29,25 +46,25 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    var decimalFormat: DecimalFormat = DecimalFormat("###,###")
 
     private var _binding: FragmentFanClubInfoBinding? = null
     private val binding get() = _binding!!
 
     private var firestore : FirebaseFirestore? = null
 
-    lateinit var recyclerView : RecyclerView
-    lateinit var recyclerViewAdapter : RecyclerViewAdapterFanClubMember
+    //lateinit var recyclerView : RecyclerView
+    //lateinit var recyclerViewAdapter : RecyclerViewAdapterFanClubMember
 
     private var fanClubDTO: FanClubDTO? = null
+    private var currentMember: MemberDTO? = null
     private var members : ArrayList<MemberDTO> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fanClubDTO = it.getParcelable(ARG_PARAM1)
+            currentMember = it.getParcelable(ARG_PARAM2)
         }
     }
 
@@ -61,37 +78,15 @@ class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
 
         firestore = FirebaseFirestore.getInstance()
 
-        recyclerView = rootView.findViewById(R.id.rv_fan_club_member!!)as RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        //recyclerView = rootView.findViewById(R.id.rv_fan_club_member!!)as RecyclerView
+        //recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // 메뉴는 기본 숨김
-        binding.layoutMenu.visibility = View.GONE
+        //recyclerViewAdapter = RecyclerViewAdapterFanClubMember(members, this)
+        //recyclerView.adapter = recyclerViewAdapter
 
-        val user = (activity as MainActivity?)?.getUser()
-        firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.get()?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                if (task.result.exists()) { // document 있음
-                    fanClubDTO = task.result.toObject(FanClubDTO::class.java)!!
-
-                    firestore?.collection("fanClub")?.document(user?.fanClubId!!)?.collection("member")?.get()?.addOnCompleteListener { task ->
-                        members.clear()
-                        if(task.isSuccessful) {
-                            for (document in task.result) {
-                                var member = document.toObject(MemberDTO::class.java)!!
-                                if (member.position != MemberDTO.POSITION.GUEST) {
-                                    members.add(member)
-                                }
-                            }
-
-                            recyclerViewAdapter = RecyclerViewAdapterFanClubMember(members, this)
-                            recyclerView.adapter = recyclerViewAdapter
-                        }
-                    }
-                } else {
-                    // 팬클럽 정보 가져오기 실패
-                }
-            }
-        }
+        //members.add(currentMember!!)
+        //recyclerViewAdapter = RecyclerViewAdapterFanClubMember(members, this)
+        //recyclerView.adapter = recyclerViewAdapter
 
         return rootView
     }
@@ -104,6 +99,156 @@ class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        refresh()
+
+        binding.editNotice.setOnTouchListener { view, motionEvent ->
+            binding.scrollView.requestDisallowInterceptTouchEvent(true)
+            false
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            (activity as MainActivity?)?.refreshFanClubDTO { fanClub ->
+                fanClubDTO = fanClub
+
+                (activity as MainActivity?)?.refreshMemberDTO { member ->
+                    currentMember = member
+                    refresh()
+
+                    (parentFragment as FragmentFanClubMain?)?.setFanClub(fanClub)
+                    (parentFragment as FragmentFanClubMain?)?.setMember(member)
+                    (parentFragment as FragmentFanClubMain?)?.setFanClubInfo()
+
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    Toast.makeText(activity, "새로 고침", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        binding.buttonModifyImage.setOnClickListener {
+            val dialog = SelectFanClubSymbolDialog(requireContext())
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+
+            dialog.setOnDismissListener {
+                if (dialog.isOK && !dialog.selectedSymbol.isNullOrEmpty()) {
+                    val question = QuestionDTO(
+                        QuestionDTO.STAT.WARNING,
+                        "팬클럽 심볼 변경",
+                        "팬클럽 심볼을 변경하면 되돌릴 수 없습니다.\n정말 변경 하시겠습니까?",
+                        dialog.selectedSymbol
+                    )
+                    val questionDialog = QuestionDialog(requireContext(), question)
+                    questionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    questionDialog.setCanceledOnTouchOutside(false)
+                    questionDialog.show()
+                    questionDialog.button_question_cancel.setOnClickListener { // No
+                        questionDialog.dismiss()
+                    }
+                    questionDialog.button_question_ok.setOnClickListener {
+                        questionDialog.dismiss()
+
+                        var imageID = requireContext().resources.getIdentifier(dialog.selectedSymbol, "drawable", requireContext().packageName)
+                        if (imageID != null) {
+                            fanClubDTO?.imgSymbol = dialog.selectedSymbol
+                            firestore?.collection("fanClub")?.document(fanClubDTO?.docName.toString())?.set(fanClubDTO!!)?.addOnCompleteListener {
+                                Toast.makeText(activity, "심볼 변경 완료!", Toast.LENGTH_SHORT).show()
+                                binding.imgSymbol.setImageResource(imageID)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        binding.buttonModifyNotice.setOnClickListener {
+            val item = EditTextDTO("공지사항 변경", fanClubDTO?.notice, 600)
+            val dialog = EditTextModifyDialog(requireContext(), item)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+            dialog.button_modify_cancel.setOnClickListener { // No
+                dialog.dismiss()
+            }
+            dialog.button_modify_ok.setOnClickListener {
+                dialog.dismiss()
+
+                val question = QuestionDTO(
+                    QuestionDTO.STAT.WARNING,
+                    "공지사항 변경",
+                    "공지사항을 변경하면 되돌릴 수 없습니다.\n정말 변경 하시겠습니까?",
+                )
+                val questionDialog = QuestionDialog(requireContext(), question)
+                questionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                questionDialog.setCanceledOnTouchOutside(false)
+                questionDialog.show()
+                questionDialog.button_question_cancel.setOnClickListener { // No
+                    questionDialog.dismiss()
+                }
+                questionDialog.button_question_ok.setOnClickListener {
+                    questionDialog.dismiss()
+
+                    fanClubDTO?.notice = dialog.edit_content.text.toString()
+                    firestore?.collection("fanClub")?.document(fanClubDTO?.docName.toString())?.set(fanClubDTO!!)?.addOnCompleteListener {
+                        Toast.makeText(activity, "공지사항 변경 완료!", Toast.LENGTH_SHORT).show()
+                        binding.editNotice.setText(fanClubDTO?.notice)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun refresh() {
+        setFanClubInfo()
+        setCurrentMemberInfo()
+    }
+
+    private fun setCurrentMemberInfo() {
+        when (currentMember?.position) {
+            MemberDTO.POSITION.MASTER -> binding.layoutPosition.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.master))
+            MemberDTO.POSITION.SUB_MASTER -> binding.layoutPosition.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.sub_master))
+            MemberDTO.POSITION.MEMBER -> binding.layoutPosition.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.member))
+        }
+        binding.imgPosition.setImageResource(currentMember?.getPositionImage()!!)
+        binding.textPosition.text = currentMember?.getPositionString()
+
+        binding.textMemberLevel.text = "Lv. ${currentMember?.userLevel}"
+        binding.textMemberName.text = currentMember?.userNickname
+        binding.textContribution.text = "기여도 : ${decimalFormat.format(currentMember?.contribution)}"
+        binding.textResponseTime.text = SimpleDateFormat("yyyy.MM.dd HH:mm").format(currentMember?.responseTime)
+        binding.textAboutMe.text = currentMember?.userAboutMe
+        binding.imgCheckout.setImageResource(currentMember?.getCheckoutImage()!!)
+    }
+
+    private fun setFanClubInfo() {
+        var imageID = requireContext().resources.getIdentifier(fanClubDTO?.imgSymbol, "drawable", requireContext().packageName)
+        binding.imgSymbol.setImageResource(imageID)
+        binding.textLevel.text = "Lv. ${fanClubDTO?.level}"
+        binding.textName.text = fanClubDTO?.name
+        binding.editNotice.setText(fanClubDTO?.notice)
+
+        when {
+            isMaster() -> { // 클럽장 메뉴 활성화
+                binding.buttonModifyImage.visibility = View.VISIBLE
+                binding.buttonModifyNotice.visibility = View.VISIBLE
+            }
+            isAdministrator() -> { // 부클럽장 메뉴 활성화
+                binding.buttonModifyImage.visibility = View.GONE
+                binding.buttonModifyNotice.visibility = View.VISIBLE
+            }
+            else -> {
+                binding.buttonModifyImage.visibility = View.GONE
+                binding.buttonModifyNotice.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun isMaster() : Boolean {
+        return currentMember?.position == MemberDTO.POSITION.MASTER
+    }
+
+    private fun isAdministrator() : Boolean {
+        return currentMember?.position == MemberDTO.POSITION.MASTER || currentMember?.position == MemberDTO.POSITION.SUB_MASTER
     }
 
     companion object {
@@ -117,26 +262,16 @@ class FragmentFanClubInfo : Fragment(), OnFanClubMemberItemClickListener {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: FanClubDTO?, param2: MemberDTO?) =
             FragmentFanClubInfo().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putParcelable(ARG_PARAM1, param1)
+                    putParcelable(ARG_PARAM2, param2)
                 }
             }
     }
 
     override fun onItemClick(item: MemberDTO, position: Int) {
-        if (recyclerViewAdapter?.selectItem(position)) { // 선택 일 경우 메뉴 표시 및 레이아웃 어둡게
-            val translateUp = AnimationUtils.loadAnimation(context, R.anim.translate_up)
-            binding.layoutMenu.visibility = View.VISIBLE
-            binding.layoutMenu.startAnimation(translateUp)
-            //recyclerView.smoothSnapToPosition(position)
-        } else { // 해제 일 경우 메뉴 숨김 및 레이아웃 밝게
-            val translateDown = AnimationUtils.loadAnimation(context, R.anim.translate_down)
-            binding.layoutMenu.visibility = View.GONE
-            binding.layoutMenu.startAnimation(translateDown)
-            //recyclerView.smoothSnapToPosition(position)
-        }
+
     }
 }
